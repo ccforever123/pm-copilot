@@ -1,12 +1,20 @@
 # PM Copilot - 产品经理文档多 Agent 协同工作流
 
+[![中文](https://img.shields.io/badge/语言-中文-blue)](README.md)
+[![English](https://img.shields.io/badge/语言-English-green)](README_EN.md)
+[![Version](https://img.shields.io/badge/版本-v1.7.1-orange)](CLAUDE.md)
+
 一套由多领域专家构成的对抗式共创文档框架，通过深度博弈产出具备"开发直接进场"水平的交付级文档。
+
+---
 
 ## 系统版本
 
-- **版本**: v1.7.1
-- **更新日期**: 2026-04-19
-- **作者**: 松鼠的AI笔记
+| 属性 | 值 |
+|:---|:---|
+| **版本** | v1.7.1 |
+| **更新日期** | 2026-04-19 |
+| **作者** | 松鼠的AI笔记 |
 
 ---
 
@@ -14,15 +22,18 @@
 
 ### 系统定位
 
-本系统是由多领域专家构成的对抗式共创环境。系统根据文档阶段动态组建专家组，通过深度博弈产出具备"开发直接进场"水平的交付级文档。
+本系统是由多领域专家构成的**对抗式共创环境**。系统根据文档阶段动态组建专家组，通过深度博弈产出具备"开发直接进场"水平的交付级文档。
 
 ### 为什么需要多 Agent 协同？
 
 传统文档撰写方式存在以下问题：
-- **单一视角局限**：一个人难以覆盖所有专业领域
-- **模糊描述泛滥**：需求文档缺乏技术细节，开发需要反复沟通
-- **一致性缺失**：不同阶段的文档之间逻辑断层、术语混乱
-- **质量不可控**：缺乏系统化的评审标准和流程
+
+| 问题类型 | 具体表现 |
+|:---|:---|
+| **单一视角局限** | 一个人难以覆盖所有专业领域 |
+| **模糊描述泛滥** | 需求文档缺乏技术细节，开发需要反复沟通 |
+| **一致性缺失** | 不同阶段的文档之间逻辑断层、术语混乱 |
+| **质量不可控** | 缺乏系统化的评审标准和流程 |
 
 PM Copilot 通过 **16 类专家角色** 的对抗式博弈，确保每个文档都经过多视角审视和深度验证。
 
@@ -101,11 +112,12 @@ PM Copilot 通过 **16 类专家角色** 的对抗式博弈，确保每个文档
 
 **适用阶段**：04-需求设计 / 05-开发执行
 
-**核心要求**：
-- ✅ 严禁模糊描述
-- ✅ 必须包含开发专家撰写的 **Step-by-step 后端逻辑**
-- ✅ UX 必须完成从"方案对比讨论"到"唯一方案撰写"的转化
-- ⚠️ 缺失技术细节或交互定稿，成熟度严禁超过 70
+| 要求项 | 说明 |
+|:---|:---|
+| ✅ 严禁模糊描述 | 所有功能必须有明确的定义 |
+| ✅ Step-by-step 后端逻辑 | 开发专家必须撰写完整的处理流程 |
+| ✅ 交互方案唯一性 | UX 必须完成从"方案对比"到"唯一方案"的转化 |
+| ⚠️ 成熟度阈值 | 缺失技术细节或交互定稿，成熟度严禁超过 70 |
 
 ### B. 通用协议 (General Mode)
 
@@ -121,85 +133,31 @@ PM Copilot 通过 **16 类专家角色** 的对抗式博弈，确保每个文档
 pm-copilot/
 ├── CLAUDE.md                     # 多 Agent 协同工作流规则（核心配置）
 ├── audit_standards.md            # 全案审计标准
-├── README.md                     # 本文档
+├── README.md                     # 中文文档
+├── README_EN.md                  # 英文文档
 │
 ├── templates/                    # 全生命周期标准化产品文档模板（72份）
-│   ├── 00-产品经理文档体系总览.md   # 模板目录和使用指南
-│   │
+│   ├── 00-产品经理文档体系总览.md
 │   ├── 01-战略规划/               # 9份文档
-│   │   ├── 01-产品愿景.md
-│   │   ├── 02-产品战略画布.md
-│   │   ├── 03-商业模式画布.md
-│   │   └── ...
-│   │
 │   ├── 02-市场研究/               # 9份文档
-│   │   ├── 01-用户画像.md
-│   │   ├── 02-客户旅程地图.md
-│   │   ├── 05-竞品分析报告.md
-│   │   └── ...
-│   │
 │   ├── 03-产品发现/               # 11份文档
-│   │   ├── 01-机会方案树.md
-│   │   ├── 02-假设识别文档.md
-│   │   ├── 04-实验设计方案.md
-│   │   └── ...
-│   │
-│   ├── 04-需求设计/               # 7份文档（硬核交付协议）
-│   │   ├── 01-产品需求文档.md     # PRD 核心
-│   │   ├── 02-用户故事文档.md
-│   │   ├── 03-用户故事地图.md
-│   │   └── ...
-│   │
-│   ├── 05-开发执行/               # 6份文档（硬核交付协议）
-│   │   ├── 01-OKR规划文档.md
-│   │   ├── 03-Sprint计划文档.md
-│   │   └── ...
-│   │
+│   ├── 04-需求设计/               # 7份文档（硬核协议）
+│   ├── 05-开发执行/               # 6份文档（硬核协议）
 │   ├── 06-市场推广/               # 6份文档
-│   │   ├── 01-GTM策略文档.md
-│   │   ├── 02-理想客户画像.md
-│   │   └── ...
-│   │
 │   ├── 07-运营增长/               # 5份文档
-│   │   ├── 01-北极星指标.md
-│   │   ├── 04-AB测试分析报告.md
-│   │   └── ...
-│   │
 │   ├── 08-通用工具/               # 8份文档
-│   │   ├── 01-会议纪要模板.md
-│   │   ├── 03-NDA保密协议.md
-│   │   └── ...
-│   │
 │   ├── 09-职业发展/               # 11份文档
-│   │   ├── 01-PM职业发展框架.md
-│   │   ├── 08-PM晋升顾问.md
-│   │   └── ...
-│   │
-│   └── tmp/                       # 临时文件（已忽略）
+│   └── tmp/                       # 临时文件
 │
 ├── skills/                       # 工具集
-│   └── minimax-skills/           # MiniMax Skills 工具集
-│       ├── plugins/              # IDE 插件适配
-│       ├── skills/               # Skills 定义
-│       └── README.md             # MiniMax Skills 说明
+│   └── minimax-skills/           # MiniMax Skills
 │
-└── projects/                     # 项目工作目录（需创建）
+└── projects/                     # 项目工作目录
     └── {项目名}/
         ├── drafts/               # Markdown 草稿
-        │   ├── 产品愿景_v1.0.0.md
-        │   ├── 产品需求文档_v1.0.1.md
-        │   └── ...
-        │
         ├── audits/               # 审计报告
-        │   ├── audit_v1.0.0.md
-        │   ├── audit_v1.0.1.md
-        │   └── ...
-        │
         ├── output/               # Word 交付物
-        │   ├── 产品愿景_v1.0.0.docx
-        │   └── ...
-        │
-        └── activity.log          # 全局唯一决策真值库
+        └── activity.log          # 决策真值库
 ```
 
 ---
@@ -210,22 +168,22 @@ pm-copilot/
 
 | 阶段 | 文档数 | 核心目标 | 激活专家 |
 |:---|:---:|:---|:---|
-| **01-战略规划** | 9份 | 明确产品方向与商业逻辑 | Strategy, Feasibility, Industry |
-| **02-市场研究** | 9份 | 深入理解市场与用户 | Market, User, Industry |
-| **03-产品发现** | 11份 | 验证需求与探索机会 | Discovery, Feasibility, Industry |
-| **04-需求设计** | 7份 | 清晰定义产品需求 | UX, Dev, Industry (硬核协议) |
-| **05-开发执行** | 6份 | 推动产品落地交付 | Agile, Dev, Industry (硬核协议) |
-| **06-市场推广** | 6份 | 制定上市策略 | GTM, Operation, Industry |
-| **07-运营增长** | 5份 | 持续优化与增长 | Operation, Data, Industry |
-| **08-通用工具** | 8份 | 支撑性文档与流程 | Process, Legal |
-| **09-职业发展** | 11份 | 职业发展与辅助工具 | Career, BA, Industry |
+| **01-战略规划** | 9 | 明确产品方向与商业逻辑 | Strategy, Feasibility, Industry |
+| **02-市场研究** | 9 | 深入理解市场与用户 | Market, User, Industry |
+| **03-产品发现** | 11 | 验证需求与探索机会 | Discovery, Feasibility, Industry |
+| **04-需求设计** | 7 | 清晰定义产品需求 | UX, Dev, Industry (硬核协议) |
+| **05-开发执行** | 6 | 推动产品落地交付 | Agile, Dev, Industry (硬核协议) |
+| **06-市场推广** | 6 | 制定上市策略 | GTM, Operation, Industry |
+| **07-运营增长** | 5 | 持续优化与增长 | Operation, Data, Industry |
+| **08-通用工具** | 8 | 支撑性文档与流程 | Process, Legal |
+| **09-职业发展** | 11 | 职业发展与辅助工具 | Career, BA, Industry |
 
 ### 文档流转关系
 
 ```
 战略规划 → 市场研究 → 产品发现 → 需求设计 → 开发执行 → 市场推广 → 运营增长
     ↓           ↓           ↓           ↓           ↓           ↓           ↓
-  指导方向   提供依据   验证假设   定义规格   推动落地   进入市场   挡续优化
+  指导方向   提供依据   验证假设   定义规格   推动落地   进入市场   持续优化
 ```
 
 ---
@@ -233,8 +191,6 @@ pm-copilot/
 ## 全案审计标准
 
 ### 跨文档一致性准则
-
-审计专家在评审当前文档前，必须检索历史文档，确保项目逻辑链条无断裂、无冲突。
 
 | 检查维度 | 说明 |
 |:---|:---|
@@ -245,8 +201,6 @@ pm-copilot/
 | **术语一致性** | 业务实体名称在所有文档中是否 100% 统一？ |
 
 ### 硬核交付级评审准则
-
-针对需求设计和开发执行阶段，必须满足：
 
 | 检查项 | 要求 |
 |:---|:---|
@@ -261,40 +215,6 @@ pm-copilot/
 
 ---
 
-## 记忆库 (activity.log) 维护规范
-
-### 日志结构
-
-```markdown
-# Activity Log - {项目名}
-
-## [Confirmed Decisions]
-- DEC-001: 产品定位为 B2B SaaS 工具
-- DEC-002: 核心用户为中小企业 PM
-- ...
-
-## [Pending Discussions]
-- Topic-001 [ACTIVE]: MVP 功能范围
-  - Industry: 倾向核心功能精简
-  - Dev: 建议分阶段交付
-  - 未决点: 是否包含数据看板
-
-- Topic-002 [PAUSED]: 定价策略
-  - Strategy: 建议订阅制
-  - ...
-
-## [Recent Changes]
-- 2026-04-19: 完成产品愿景文档 v1.0.0
-- 2026-04-20: 开始产品战略画布共创
-- ...
-
-## [Completed Documents]
-- 产品愿景_v1.0.0.md [PASS]
-- ...
-```
-
----
-
 ## 快速开始
 
 ### 1. 环境准备
@@ -303,11 +223,10 @@ pm-copilot/
 # 克隆仓库
 git clone https://github.com/ccforever123/pm-copilot.git
 
-# 安装 Claude Code CLI（如未安装）
+# 安装 Claude Code CLI
 # 参考：https://claude.ai/code
 
 # 安装 MiniMax Skills（可选）
-git clone https://github.com/MiniMax-AI/skills.git
 pip install minimax-skills
 ```
 
@@ -379,7 +298,7 @@ Creator 整合完成: 产品需求文档_v1.0.1.md
 
 ---
 
-## 版本信息
+## 版本历史
 
 | 版本 | 日期 | 核心变更 |
 |:---|:---|:---|
@@ -393,20 +312,22 @@ Creator 整合完成: 产品需求文档_v1.0.1.md
 
 本框架融合以下产品管理方法论：
 
-- **Teresa Torres** — Continuous Discovery Habits（持续发现习惯）
-- **Marty Cagan** — INSPIRED & TRANSFORMED（启示与转型）
-- **Alberto Savoia** — The Right It（正确的事）
-- **Dan Olsen** — The Lean Product Playbook（精益产品手册）
-- **Roger L. Martin** — Playing to Win（赢的战略）
-- **Ash Maurya** — Running Lean（精益运营）
-- **Strategyzer** — Business Model Generation（商业模式新生代）
-- **Amazon** — Working Backwards（逆向工作法）
+| 方法论 | 作者 | 核心贡献 |
+|:---|:---|:---|
+| Continuous Discovery Habits | Teresa Torres | 持续发现习惯 |
+| INSPIRED & TRANSFORMED | Marty Cagan | 启示与转型 |
+| The Right It | Alberto Savoia | 正确的事 |
+| The Lean Product Playbook | Dan Olsen | 精益产品手册 |
+| Playing to Win | Roger L. Martin | 赢的战略 |
+| Running Lean | Ash Maurya | 精益运营 |
+| Business Model Generation | Strategyzer | 商业模式新生代 |
+| Working Backwards | Amazon | 逆向工作法 |
 
 ---
 
 ## 版权声明
 
-本框架由"松鼠男"（松鼠的AI笔记）设计开发。
+本框架由 **"松鼠男"（松鼠的AI笔记）** 设计开发。
 
 在二次分发或引用时，请务必保留作者署名及版本信息。
 
