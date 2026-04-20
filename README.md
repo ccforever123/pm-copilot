@@ -188,6 +188,41 @@ pm-copilot/
 ├── README.md                     # 中文文档
 ├── README_EN.md                  # 英文文档
 │
+├── .skills/                      # 专家提示词体系 (v1.9.0 新增)
+│   ├── TOKEN_OPTIMIZATION.md     # Token 按需加载策略说明
+│   │
+│   ├── auditor/                  # 审计专家
+│   │   ├── SKILL.md              # 专家定义
+│   │   ├── checklist.md          # 总检查清单
+│   │   └── checklists/           # 9阶段独立审计清单
+│   │       ├── 01-strategy-audit.md
+│   │       ├── 02-market-audit.md
+│   │       ├── 03-discovery-audit.md
+│   │       ├── 04-requirement-audit.md
+│   │       ├── 05-execution-audit.md
+│   │       ├── 06-gtm-audit.md
+│   │       ├── 07-operation-audit.md
+│   │       ├── 08-tool-audit.md
+│   │       └── 09-career-audit.md
+│   │
+│   ├── strategy-expert/          # 战略专家
+│   ├── industry-expert/          # 行业专家
+│   ├── feasibility-expert/       # 可行性专家
+│   ├── market-expert/            # 市场研究专家
+│   ├── user-expert/              # 用户研究专家
+│   ├── discovery-expert/         # 创新发现专家
+│   ├── ux-expert/                # UX专家
+│   ├── dev-expert/               # 全栈开发专家
+│   ├── agile-expert/             # 敏捷教练
+│   ├── gtm-expert/               # GTM专家
+│   ├── operation-expert/         # 运营专家
+│   ├── data-expert/              # 数据分析专家
+│   ├── process-expert/           # 流程效率专家
+│   ├── legal-expert/             # 合规顾问
+│   ├── career-expert/            # 职业导师
+│   ├── ba-expert/                # 商业分析专家
+│   └── ...                       # 每个专家含 SKILL.md 定义
+│
 ├── templates/                    # 全生命周期标准化产品文档模板（72份）
 │   ├── 00-产品经理文档体系总览.md
 │   ├── 01-战略规划/               # 9份文档
@@ -201,8 +236,8 @@ pm-copilot/
 │   ├── 09-职业发展/               # 11份文档
 │   └── tmp/                       # 临时文件
 │
-├── skills/                       # 工具集
-│   └── minimax-skills/           # MiniMax Skills
+├── skills/                       # MiniMax Skills 工具集
+│   └── minimax-skills/
 │
 └── projects/                     # 项目工作目录
     └── {项目名}/
@@ -379,6 +414,7 @@ Creator 整合完成: 产品需求文档_v1.0.1.md
 
 | 版本 | 日期 | 核心变更 |
 |:---|:---|:---|
+| v1.9.0 | 2026-04-20 | **重构专家提示词体系**：建立 `.skills/` 独立专家定义目录；**独立审计 checklist 机制**：9阶段独立审计清单；**Token 按需加载策略**：优化加载效率 |
 | v1.8.0 | 2026-04-20 | **引入外部信息检索强制协议**、新增真实性审计准则、禁止臆想表述 |
 | v1.7.1 | 2026-04-19 | 找回文档分类执行协议、补全16类专家字典、落实分布式撰写 |
 | v1.7.0 | 2026-04-18 | 强化UX对抗决策闭环 |

@@ -188,6 +188,41 @@ pm-copilot/
 ├── README.md                     # Chinese documentation
 ├── README_EN.md                  # English documentation
 │
+├── .skills/                      # Expert Prompt System (v1.9.0 New)
+│   ├── TOKEN_OPTIMIZATION.md     # Token on-demand loading strategy
+│   │
+│   ├── auditor/                  # Auditor Expert
+│   │   ├── SKILL.md              # Expert definition
+│   │   ├── checklist.md          # Master checklist
+│   │   └── checklists/           # 9-stage independent audit checklists
+│   │       ├── 01-strategy-audit.md
+│   │       ├── 02-market-audit.md
+│   │       ├── 03-discovery-audit.md
+│   │       ├── 04-requirement-audit.md
+│   │       ├── 05-execution-audit.md
+│   │       ├── 06-gtm-audit.md
+│   │       ├── 07-operation-audit.md
+│   │       ├── 08-tool-audit.md
+│   │       └── 09-career-audit.md
+│   │
+│   ├── strategy-expert/          # Strategy Expert
+│   ├── industry-expert/          # Industry Expert
+│   ├── feasibility-expert/       # Feasibility Expert
+│   ├── market-expert/            # Market Research Expert
+│   ├── user-expert/              # User Research Expert
+│   ├── discovery-expert/         # Discovery Expert
+│   ├── ux-expert/                # UX Expert
+│   ├── dev-expert/               # Full-stack Developer Expert
+│   ├── agile-expert/             # Agile Coach
+│   ├── gtm-expert/               # GTM Expert
+│   ├── operation-expert/         # Operations Expert
+│   ├── data-expert/              # Data Analyst Expert
+│   ├── process-expert/           # Process Efficiency Expert
+│   ├── legal-expert/             # Legal Advisor
+│   ├── career-expert/            # Career Mentor
+│   ├── ba-expert/                # Business Analyst Expert
+│   └── ...                       # Each expert contains SKILL.md definition
+│
 ├── templates/                    # Full lifecycle standardized PM document templates (72 docs)
 │   ├── 00-产品经理文档体系总览.md
 │   ├── 01-战略规划/               # 9 documents (Strategy Planning)
@@ -201,8 +236,8 @@ pm-copilot/
 │   ├── 09-职业发展/               # 11 documents (Career Development)
 │   └── tmp/                       # Temporary files
 │
-├── skills/                       # Toolkit
-│   └── minimax-skills/           # MiniMax Skills
+├── skills/                       # MiniMax Skills toolkit
+│   └── minimax-skills/
 │
 └── projects/                     # Project workspace
     └── {project_name}/
@@ -379,6 +414,7 @@ Creator integration complete: 产品需求文档_v1.0.1.md
 
 | Version | Date | Core Changes |
 |:---|:---|:---|
+| v1.9.0 | 2026-04-20 | **Refactored expert prompt system**: Created `.skills/` independent expert definition directory; **Independent audit checklist mechanism**: 9-stage independent audit checklists; **Token on-demand loading strategy**: Optimized loading efficiency |
 | v1.8.0 | 2026-04-20 | **Introduced Mandatory External Research Protocol**, added Factuality Audit Criteria, prohibited speculation |
 | v1.7.1 | 2026-04-19 | Restore document classification protocol, complete 16 expert dictionary, implement distributed writing |
 | v1.7.0 | 2026-04-18 | Strengthen UX adversarial decision closed-loop |
