@@ -1,0 +1,4 @@
+[submodule "skills/minimax-skills"]
+	path = skills/minimax-skills
+	url = https://github.com/MiniMax-AI/skills.git
+	branch = main

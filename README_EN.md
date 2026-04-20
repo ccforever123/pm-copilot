@@ -2,7 +2,7 @@
 
 [![中文](https://img.shields.io/badge/Language-Chinese-blue)](README.md)
 [![English](https://img.shields.io/badge/Language-English-green)](README_EN.md)
-[![Version](https://img.shields.io/badge/Version-v1.8.0-orange)](CLAUDE.md)
+[![Version](https://img.shields.io/badge/Version-v1.9.0-orange)](CLAUDE.md)
 
 An adversarial co-creation document framework composed of multi-domain experts, producing delivery-level documents ready for "developer direct entry" through deep deliberation. **No speculation allowed—all key decisions must be based on latest verified facts.**
 
@@ -12,10 +12,10 @@ An adversarial co-creation document framework composed of multi-domain experts, 
 
 | Attribute | Value |
 |:---|:---|
-| **Version** | v1.8.0 |
+| **Version** | v1.9.0 |
 | **Update Date** | 2026-04-20 |
 | **Author** | Squirrel's AI Notes (松鼠的AI笔记) |
-| **Core Change** | Introduced **Mandatory External Research Protocol**, prohibited speculation, required all facts to have verifiable sources |
+| **Core Change** | Refactored expert prompt system, established independent audit checklist mechanism, optimized token on-demand loading strategy, improved MECE methodology application |
 
 ---
 

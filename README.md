@@ -2,7 +2,7 @@
 
 [![中文](https://img.shields.io/badge/语言-中文-blue)](README.md)
 [![English](https://img.shields.io/badge/语言-English-green)](README_EN.md)
-[![Version](https://img.shields.io/badge/版本-v1.8.0-orange)](CLAUDE.md)
+[![Version](https://img.shields.io/badge/版本-v1.9.0-orange)](CLAUDE.md)
 
 一套由多领域专家构成的对抗式共创文档框架，通过深度博弈产出具备"开发直接进场"水平的交付级文档。**严禁闭门造车，所有关键决策必须基于最新事实数据。**
 
@@ -12,10 +12,10 @@
 
 | 属性 | 值 |
 |:---|:---|
-| **版本** | v1.8.0 |
+| **版本** | v1.9.0 |
 | **更新日期** | 2026-04-20 |
 | **作者** | 松鼠的AI笔记 |
-| **核心变更** | 引入【外部信息检索强制协议】，禁止臆想，要求所有事实基于可验证来源 |
+| **核心变更** | 重构专家提示词体系，建立独立审计checklist机制，优化Token按需加载策略 |
 
 ---
 
