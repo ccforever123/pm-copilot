@@ -17,7 +17,7 @@ An adversarial co-creation document framework composed of multi-domain experts, 
 | **Author** | Squirrel's AI Notes (松鼠的AI笔记) |
 | **Core Changes** | 
   - **Added Custom Template Support**: `/templates/customized/` directory with priority retrieval
-  - **Added Expert Intelligent Matching**: Auto-select best 3 experts from 16-expert library
+  - **Added Expert Intelligent Matching**: Auto-select best 3 experts from 16-expert library for custom templates
   - **Stage 0 Entry Gate**: Mandatory intent recognition
   - **Frontend Page Specification**: PRD template with 8 page structure definitions |
 
@@ -238,9 +238,18 @@ keywords: [Keyword List]
 
 ## 🎯 Expert Intelligent Matching (v1.11.0 New)
 
-### Auto-Select Best 3 Experts
+### Applicable Scenario
 
-System intelligently matches the most suitable 3 experts from **16-expert library**:
+Expert intelligent matching **only triggers when using custom templates**. Standard templates have pre-configured experts and use them directly.
+
+| Template Type | Expert Activation Method |
+|:---|:---|
+| **Custom Template** | Intelligent matching: Select best 3 experts from 16-expert library based on template `recommended_experts` and `keywords` |
+| **Standard Template** | Direct use: Adopt experts defined in template header `专家角色` field |
+
+### Custom Template Expert Matching Flow
+
+When user uses a custom template, system intelligently matches the most suitable 3 experts from **16-expert library**:
 
 | Matching Basis | Weight | Description |
 |:---|:---:|:---|
@@ -248,7 +257,7 @@ System intelligently matches the most suitable 3 experts from **16-expert librar
 | Keyword-expert responsibility match | Secondary | Calculate similarity, select most matching experts |
 | Stage default expert config | Fallback | If no recommendation, use stage default config |
 
-### Stage Default Expert Configuration
+### Stage Default Expert Configuration (Fallback)
 
 | Stage | Default Active Experts (Top 3) |
 |:---|:---|
@@ -261,6 +270,36 @@ System intelligently matches the most suitable 3 experts from **16-expert librar
 | 07-Operations & Growth | Operation, Data, Industry |
 | 08-General Tools | Process, Legal, Industry |
 | 09-Career Development | Career, BA, Industry |
+
+### Matching Example (Custom Template Scenario)
+
+```
+User: "Write requirements using mobile PRD template"
+
+System Response:
+Retrieve custom template: templates/customized/04-移动端PRD模板.md
+Template recommended experts: UX, Dev, Industry
+Keyword match: [移动端, APP, 前端, UI, 交互, 性能]
+
+Expert intelligent matching result:
+- UX Expert: Matches [UI, 交互] → Responsible for page specs
+- Dev Expert: Matches [性能, 后端] → Responsible for tech specs
+- Industry Expert: Template recommendation → Responsible for business rules
+
+Active Experts: UX, Dev, Industry ✓
+```
+
+### Standard Template Expert Activation Example
+
+```
+User: "Help me write PRD"
+
+System Response:
+Retrieve standard template: templates/04-需求设计/01-产品需求文档.md
+Template header defines: 专家角色: UX, Dev, Industry
+
+Directly activate: UX, Dev, Industry ✓
+```
 
 ---
 
@@ -525,7 +564,7 @@ Creator integration complete: 产品需求文档_v1.0.1.md
 
 | Version | Date | Core Changes |
 |:---|:---|:---|
-| v1.11.0 | 2026-04-21 | **Added Custom Template Support**: `/templates/customized/` directory with priority retrieval; **Added Expert Intelligent Matching**: Auto-select best 3 experts from 16-expert library |
+| v1.11.0 | 2026-04-21 | **Added Custom Template Support**: `/templates/customized/` directory with priority retrieval; **Added Expert Intelligent Matching**: Auto-select best 3 experts from 16-expert library for custom templates |
 | v1.10.0 | 2026-04-21 | **Added Stage 0**: Entry Gate protocol, mandatory intent recognition for all user inputs; **Added Frontend Specification**: PRD template with 8 page structure definitions; **Strengthened Audit**: Missing frontend spec = P0 defect |
 | v1.9.0 | 2026-04-20 | **Refactored expert prompt system**: Created `.skills/` independent expert definition directory; **Independent audit checklist mechanism**: 9-stage independent audit checklists; **Token on-demand loading strategy**: Optimized loading efficiency |
 | v1.8.0 | 2026-04-20 | **Introduced Mandatory External Research Protocol**, added Factuality Audit Criteria, prohibited speculation |
