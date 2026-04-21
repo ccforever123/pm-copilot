@@ -2,7 +2,7 @@
 
 [![中文](https://img.shields.io/badge/Language-Chinese-blue)](README.md)
 [![English](https://img.shields.io/badge/Language-English-green)](README_EN.md)
-[![Version](https://img.shields.io/badge/Version-v1.9.0-orange)](CLAUDE.md)
+[![Version](https://img.shields.io/badge/Version-v1.10.0-orange)](CLAUDE.md)
 
 An adversarial co-creation document framework composed of multi-domain experts, producing delivery-level documents ready for "developer direct entry" through deep deliberation. **No speculation allowed—all key decisions must be based on latest verified facts.**
 
@@ -12,10 +12,13 @@ An adversarial co-creation document framework composed of multi-domain experts, 
 
 | Attribute | Value |
 |:---|:---|
-| **Version** | v1.9.0 |
-| **Update Date** | 2026-04-20 |
+| **Version** | v1.10.0 |
+| **Update Date** | 2026-04-21 |
 | **Author** | Squirrel's AI Notes (松鼠的AI笔记) |
-| **Core Change** | Refactored expert prompt system, established independent audit checklist mechanism, optimized token on-demand loading strategy, improved MECE methodology application |
+| **Core Changes** | 
+  - **Added Stage 0**: Entry Gate protocol, mandatory intent recognition
+  - **Added Frontend Specification**: PRD template with 8 page structure definitions
+  - **Strengthened Audit Standards**: Missing frontend spec = P0 defect |
 
 ---
 
@@ -414,6 +417,7 @@ Creator integration complete: 产品需求文档_v1.0.1.md
 
 | Version | Date | Core Changes |
 |:---|:---|:---|
+| v1.10.0 | 2026-04-21 | **Added Stage 0**: Entry Gate protocol, mandatory intent recognition for all user inputs; **Added Frontend Specification**: PRD template with 8 page structure definitions; **Strengthened Audit**: Missing frontend spec = P0 defect |
 | v1.9.0 | 2026-04-20 | **Refactored expert prompt system**: Created `.skills/` independent expert definition directory; **Independent audit checklist mechanism**: 9-stage independent audit checklists; **Token on-demand loading strategy**: Optimized loading efficiency |
 | v1.8.0 | 2026-04-20 | **Introduced Mandatory External Research Protocol**, added Factuality Audit Criteria, prohibited speculation |
 | v1.7.1 | 2026-04-19 | Restore document classification protocol, complete 16 expert dictionary, implement distributed writing |
