@@ -2,7 +2,7 @@
 
 [![中文](https://img.shields.io/badge/Language-Chinese-blue)](README.md)
 [![English](https://img.shields.io/badge/Language-English-green)](README_EN.md)
-[![Version](https://img.shields.io/badge/Version-v1.11.0-orange)](CLAUDE.md)
+[![Version](https://img.shields.io/badge/Version-v1.12.0-orange)](CLAUDE.md)
 
 An adversarial co-creation document framework composed of multi-domain experts, producing delivery-level documents ready for "developer direct entry" through deep deliberation. **No speculation allowed—all key decisions must be based on latest verified facts.**
 
@@ -12,10 +12,12 @@ An adversarial co-creation document framework composed of multi-domain experts, 
 
 | Attribute | Value |
 |:---|:---|
-| **Version** | v1.11.0 |
+| **Version** | v1.12.0 |
 | **Update Date** | 2026-04-21 |
 | **Author** | Squirrel's AI Notes (松鼠的AI笔记) |
 | **Core Changes** | 
+  - **Strengthened document modification trigger rules**: Any document modification or new requirement must trigger complete expert mode workflow
+  - **Added document modification intent recognition**: Entry Gate protocol now includes modification opinion recognition and response
   - **Added Custom Template Support**: `/templates/customized/` directory with priority retrieval
   - **Added Expert Intelligent Matching**: Auto-select best 3 experts from 16-expert library for custom templates
   - **Stage 0 Entry Gate**: Mandatory intent recognition
@@ -102,6 +104,8 @@ PM Copilot ensures every document undergoes multi-perspective review and fact ve
 ### Core Principle
 
 > **Any user input, regardless of expression (vague or specific), must go through intent parsing. Expert activation flow cannot be bypassed.**
+>
+> **Any document modification or new requirement must trigger the complete expert mode workflow.**
 
 ### Intent Recognition Rules
 
@@ -110,16 +114,32 @@ PM Copilot ensures every document undergoes multi-perspective review and fact ve
 | "I want to build XX" | New project initiation intent | Enter Stage 1, activate strategy planning expert group |
 | "Help me write PRD" | Requirements design intent | Enter Stage 1, activate UX/Dev/Industry experts |
 | "Generate XX document" | Specific document intent | Activate corresponding experts based on document type |
+| "Modify XX feature", "Add XX requirement" | **Document modification intent** | **Activate corresponding expert group for deliberation** |
+| "This logic is wrong", "Add XX details" | **Modification opinion intent** | **Activate expert group to re-examine related modules** |
 | "Continue XX discussion" | Project continuation intent | Restore historical expert positions |
-| Other vague expressions | Clarification query | "Do you want to start a new project or continue working on a document?" |
+| Other vague expressions | Clarification query | "Do you want to start a new project, modify a document, or continue some work?" |
+
+### Document Modification Trigger Rules
+
+**Core Principle: Any document modification must undergo expert group deliberation**
+
+| Modification Type | Triggered Process | Active Experts |
+|:---|:---|:---|
+| Add new feature requirement | Full deliberation process | UX, Dev, Industry |
+| Modify business logic | Deliberation review | Industry, Dev |
+| Modify interaction design | UX-led review | UX, Dev |
+| Modify technical solution | Dev-led review | Dev, Industry |
+| Add detail descriptions | Targeted review | Related domain experts |
 
 ### Prohibited Behaviors
 
 | Prohibited Behavior | Reason |
-|:---|:---|
+|:---|:---|:---|
 | ❌ Directly start generating documents | Bypassed expert activation and deliberation stages |
 | ❌ Directly enter planning mode | Intent type not recognized |
 | ❌ Skip expert activation | Expert prompts and checklists not loaded |
+| ❌ Directly modify document content | Bypassed expert group deliberation and verification |
+| ❌ Directly accept modification opinions | Bypassed expert deliberation to confirm validity |
 
 ---
 
@@ -564,6 +584,7 @@ Creator integration complete: 产品需求文档_v1.0.1.md
 
 | Version | Date | Core Changes |
 |:---|:---|:---|
+| v1.12.0 | 2026-04-21 | **Strengthened document modification trigger rules**: Any document modification or new requirement must trigger complete expert mode workflow; **Added document modification intent recognition**: Entry Gate protocol includes modification opinion recognition and response templates |
 | v1.11.0 | 2026-04-21 | **Added Custom Template Support**: `/templates/customized/` directory with priority retrieval; **Added Expert Intelligent Matching**: Auto-select best 3 experts from 16-expert library for custom templates |
 | v1.10.0 | 2026-04-21 | **Added Stage 0**: Entry Gate protocol, mandatory intent recognition for all user inputs; **Added Frontend Specification**: PRD template with 8 page structure definitions; **Strengthened Audit**: Missing frontend spec = P0 defect |
 | v1.9.0 | 2026-04-20 | **Refactored expert prompt system**: Created `.skills/` independent expert definition directory; **Independent audit checklist mechanism**: 9-stage independent audit checklists; **Token on-demand loading strategy**: Optimized loading efficiency |
