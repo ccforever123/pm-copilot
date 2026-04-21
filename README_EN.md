@@ -2,7 +2,7 @@
 
 [![中文](https://img.shields.io/badge/Language-Chinese-blue)](README.md)
 [![English](https://img.shields.io/badge/Language-English-green)](README_EN.md)
-[![Version](https://img.shields.io/badge/Version-v1.10.0-orange)](CLAUDE.md)
+[![Version](https://img.shields.io/badge/Version-v1.11.0-orange)](CLAUDE.md)
 
 An adversarial co-creation document framework composed of multi-domain experts, producing delivery-level documents ready for "developer direct entry" through deep deliberation. **No speculation allowed—all key decisions must be based on latest verified facts.**
 
@@ -12,13 +12,14 @@ An adversarial co-creation document framework composed of multi-domain experts, 
 
 | Attribute | Value |
 |:---|:---|
-| **Version** | v1.10.0 |
+| **Version** | v1.11.0 |
 | **Update Date** | 2026-04-21 |
 | **Author** | Squirrel's AI Notes (松鼠的AI笔记) |
 | **Core Changes** | 
-  - **Added Stage 0**: Entry Gate protocol, mandatory intent recognition
-  - **Added Frontend Specification**: PRD template with 8 page structure definitions
-  - **Strengthened Audit Standards**: Missing frontend spec = P0 defect |
+  - **Added Custom Template Support**: `/templates/customized/` directory with priority retrieval
+  - **Added Expert Intelligent Matching**: Auto-select best 3 experts from 16-expert library
+  - **Stage 0 Entry Gate**: Mandatory intent recognition
+  - **Frontend Page Specification**: PRD template with 8 page structure definitions |
 
 ---
 
@@ -46,9 +47,17 @@ PM Copilot ensures every document undergoes multi-perspective review and fact ve
 
 ## Core Workflow
 
-### Four-Stage Closed-Loop Process
+### Five-Stage Closed-Loop Process (v1.10.0 Update)
 
 ```
+┌─────────────────────────────────────────────────────────────────────┐
+│  Stage 0: Entry Gate & Intent Recognition **New v1.10.0**           │
+│  ├─ Intent Recognition: All user inputs must go through intent parsing│
+│  ├─ Clarification: Ask user when intent is unclear                  │
+│  ├─ Stage Matching: Match corresponding stage based on intent type   │
+│  └─ Mandatory Gate: Expert activation flow cannot be bypassed       │
+└─────────────────────────────────────────────────────────────────────┘
+                                   ↓
 ┌─────────────────────────────────────────────────────────────────────┐
 │  Stage 1: Initialization & Wake-up                                   │
 │  ├─ Project Identification: Lock recent active project via activity.log│
@@ -85,6 +94,32 @@ PM Copilot ensures every document undergoes multi-perspective review and fact ve
 │  └─ Verification: Confirm successful file generation                 │
 └─────────────────────────────────────────────────────────────────────┘
 ```
+
+---
+
+## 🚪 Entry Gate Protocol (v1.10.0 New)
+
+### Core Principle
+
+> **Any user input, regardless of expression (vague or specific), must go through intent parsing. Expert activation flow cannot be bypassed.**
+
+### Intent Recognition Rules
+
+| User Expression Type | Recognition Rule | System Response |
+|:---|:---|:---|
+| "I want to build XX" | New project initiation intent | Enter Stage 1, activate strategy planning expert group |
+| "Help me write PRD" | Requirements design intent | Enter Stage 1, activate UX/Dev/Industry experts |
+| "Generate XX document" | Specific document intent | Activate corresponding experts based on document type |
+| "Continue XX discussion" | Project continuation intent | Restore historical expert positions |
+| Other vague expressions | Clarification query | "Do you want to start a new project or continue working on a document?" |
+
+### Prohibited Behaviors
+
+| Prohibited Behavior | Reason |
+|:---|:---|
+| ❌ Directly start generating documents | Bypassed expert activation and deliberation stages |
+| ❌ Directly enter planning mode | Intent type not recognized |
+| ❌ Skip expert activation | Expert prompts and checklists not loaded |
 
 ---
 
@@ -161,6 +196,74 @@ Impact Conclusion: xxx
 
 ---
 
+## 📁 Custom Template Support (v1.11.0 New)
+
+### Custom Template Directory
+
+Users can store custom templates in `/templates/customized/` directory. System **prioritizes custom templates** during retrieval.
+
+```
+templates/
+├── customized/                    # Custom template directory (priority retrieval)
+│   ├── 00-使用指南.md              # Usage guide
+│   ├── 04-移动端PRD模板.md         # Example custom template
+│   └── ...                        # Other custom templates
+│
+├── 01-战略规划/                    # Standard templates (fallback retrieval)
+├── 04-需求设计/
+└── ...
+```
+
+### Custom Template Format
+
+```markdown
+---
+name: [Template Name]
+stage: [Stage Number]
+recommended_experts: [UX, Dev, Industry]
+keywords: [Keyword List]
+---
+
+# Template Content...
+```
+
+### Retrieval Priority
+
+| Priority | Retrieval Path | Description |
+|:---:|:---|:---|
+| 1 | `/templates/customized/` | User custom templates, priority retrieval |
+| 2 | `/templates/{stage-number}-{name}/` | Standard templates, fallback retrieval |
+
+---
+
+## 🎯 Expert Intelligent Matching (v1.11.0 New)
+
+### Auto-Select Best 3 Experts
+
+System intelligently matches the most suitable 3 experts from **16-expert library**:
+
+| Matching Basis | Weight | Description |
+|:---|:---:|:---|
+| Template `recommended_experts` field | Highest | Directly adopt template recommended experts |
+| Keyword-expert responsibility match | Secondary | Calculate similarity, select most matching experts |
+| Stage default expert config | Fallback | If no recommendation, use stage default config |
+
+### Stage Default Expert Configuration
+
+| Stage | Default Active Experts (Top 3) |
+|:---|:---|
+| 01-Strategy Planning | Strategy, Industry, Feasibility |
+| 02-Market Research | Market, User, Industry |
+| 03-Product Discovery | Discovery, Feasibility, Industry |
+| 04-Requirements Design | UX, Dev, Industry |
+| 05-Development Execution | Agile, Dev, Industry |
+| 06-Market Promotion | GTM, Operation, Industry |
+| 07-Operations & Growth | Operation, Data, Industry |
+| 08-General Tools | Process, Legal, Industry |
+| 09-Career Development | Career, BA, Industry |
+
+---
+
 ## Document Classification Execution Protocol
 
 ### A. Hardcore Delivery Protocol (Hardcore Mode)
@@ -227,6 +330,11 @@ pm-copilot/
 │   └── ...                       # Each expert contains SKILL.md definition
 │
 ├── templates/                    # Full lifecycle standardized PM document templates (72 docs)
+│   ├── customized/               # Custom template directory (v1.11.0 New, priority retrieval)
+│   │   ├── 00-使用指南.md        # Custom template usage guide
+│   │   ├── 04-移动端PRD模板.md   # Example custom template
+│   │   └── ...                   # User custom templates
+│   │
 │   ├── 00-产品经理文档体系总览.md
 │   ├── 01-战略规划/               # 9 documents (Strategy Planning)
 │   ├── 02-市场研究/               # 9 documents (Market Research)
@@ -417,6 +525,7 @@ Creator integration complete: 产品需求文档_v1.0.1.md
 
 | Version | Date | Core Changes |
 |:---|:---|:---|
+| v1.11.0 | 2026-04-21 | **Added Custom Template Support**: `/templates/customized/` directory with priority retrieval; **Added Expert Intelligent Matching**: Auto-select best 3 experts from 16-expert library |
 | v1.10.0 | 2026-04-21 | **Added Stage 0**: Entry Gate protocol, mandatory intent recognition for all user inputs; **Added Frontend Specification**: PRD template with 8 page structure definitions; **Strengthened Audit**: Missing frontend spec = P0 defect |
 | v1.9.0 | 2026-04-20 | **Refactored expert prompt system**: Created `.skills/` independent expert definition directory; **Independent audit checklist mechanism**: 9-stage independent audit checklists; **Token on-demand loading strategy**: Optimized loading efficiency |
 | v1.8.0 | 2026-04-20 | **Introduced Mandatory External Research Protocol**, added Factuality Audit Criteria, prohibited speculation |
