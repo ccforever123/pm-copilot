@@ -2,7 +2,7 @@
 
 [![中文](https://img.shields.io/badge/Language-Chinese-blue)](README.md)
 [![English](https://img.shields.io/badge/Language-English-green)](README_EN.md)
-[![Version](https://img.shields.io/badge/Version-v1.12.0-orange)](CLAUDE.md)
+[![Version](https://img.shields.io/badge/Version-v1.13.0-orange)](CLAUDE.md)
 
 An adversarial co-creation document framework composed of multi-domain experts, producing delivery-level documents ready for "developer direct entry" through deep deliberation. **No speculation allowed—all key decisions must be based on latest verified facts.**
 
@@ -12,10 +12,12 @@ An adversarial co-creation document framework composed of multi-domain experts, 
 
 | Attribute | Value |
 |:---|:---|
-| **Version** | v1.12.0 |
-| **Update Date** | 2026-04-21 |
+| **Version** | v1.13.0 |
+| **Update Date** | 2026-04-22 |
 | **Author** | Squirrel's AI Notes (松鼠的AI笔记) |
 | **Core Changes** | 
+  - **Added Context Awareness Mechanism**: Entry Gate protocol adds question ID tracking to distinguish "response to expert questions" from "new intent input"
+  - **Added Question ID Tracking Specification**: Expert questions must be tagged with [Q1], [Q2] format; system records pending questions list to activity.log
   - **Strengthened document modification trigger rules**: Any document modification or new requirement must trigger complete expert mode workflow
   - **Added document modification intent recognition**: Entry Gate protocol now includes modification opinion recognition and response
   - **Added Custom Template Support**: `/templates/customized/` directory with priority retrieval
@@ -99,15 +101,65 @@ PM Copilot ensures every document undergoes multi-perspective review and fact ve
 
 ---
 
-## 🚪 Entry Gate Protocol (v1.10.0 New)
+## 🚪 Entry Gate Protocol (v1.13.0 Enhanced)
 
 ### Core Principle
 
 > **Any user input, regardless of expression (vague or specific), must go through intent parsing. Expert activation flow cannot be bypassed.**
 >
 > **Any document modification or new requirement must trigger the complete expert mode workflow.**
+>
+> **Exception Rule**: When the system is in an active expert deliberation state and the user input is a direct response to an expert's question, Stage 0 may be skipped to continue the current workflow.
 
-### Intent Recognition Rules
+### Context Awareness Mechanism (v1.13.0 New)
+
+**Core Goal**: Prevent repeatedly triggering Stage 0 when users are simply answering expert questions, which interrupts the deliberation flow.
+
+**Step 0: Context Check (Executed First)**
+
+The system first checks whether there is an active expert conversation:
+
+```
+Check [Pending Questions] list in activity.log:
+├─ Are there pending questions?
+│   ├─ Yes → Determine if input is a response to an expert question
+│   └─ No → Proceed to standard intent recognition
+```
+
+**Response Determination Rules**
+
+| User Input Characteristic | Determination | Action |
+|:---|:---|:---|
+| Direct answer to pending question | **Continue current flow** | Skip Stage 0, pass response to corresponding expert |
+| Agreement/disagreement with expert view | **Continue current flow** | Skip Stage 0, continue deliberation |
+| Clarification or supplementary info | **Continue current flow** | Skip Stage 0, add to current discussion |
+| Contains intent-switch keywords | **New intent** | Trigger full Stage 0 workflow |
+| Proposes entirely new document/feature | **New intent** | Trigger full Stage 0 workflow |
+| Topic clearly diverges from current discussion | **New intent** | Trigger full Stage 0 workflow |
+
+**Intent-Switching Keyword Table**
+
+| Keyword Type | Examples |
+|:---|:---|
+| Modification | "modify", "change to", "switch to", "use another", "replace with" |
+| Restart | "restart", "start over", "forget it", "overturn", "redo" |
+| Addition | "also", "add another", "plus", "supplement", "new" |
+| Switch | "change topic", "not this", "do something else first" |
+| Document | "help me write", "generate", "I want to build", "output" |
+
+### Question ID Tracking Mechanism (v1.13.0 New)
+
+**Question Tagging Specification**:
+- Experts must tag questions with IDs during deliberation, format: `[Q{number}] {question content}`
+- Example: `[Q1] Who is the target user group?`
+- Each question ID is unique in the current conversation, starting from Q1
+
+**Pending Question Recording**:
+- After expert asks a question, system records the question ID to `[Pending Questions]` list in `activity.log`
+- After user answers, corresponding question ID is marked `[Answered]`
+- When all pending questions are resolved, `[Pending Questions]` list is cleared
+
+### Intent Recognition Rules (Executed when no active conversation or determined as new intent)
 
 | User Expression Type | Recognition Rule | System Response |
 |:---|:---|:---|
@@ -140,6 +192,8 @@ PM Copilot ensures every document undergoes multi-perspective review and fact ve
 | ❌ Skip expert activation | Expert prompts and checklists not loaded |
 | ❌ Directly modify document content | Bypassed expert group deliberation and verification |
 | ❌ Directly accept modification opinions | Bypassed expert deliberation to confirm validity |
+| ❌ Expert questions without tagging question IDs | Unable to track conversation context, causing repeated Stage 0 triggers |
+| ❌ Ignore pending questions when user responds | May cause intent misjudgment |
 
 ---
 
@@ -584,6 +638,7 @@ Creator integration complete: 产品需求文档_v1.0.1.md
 
 | Version | Date | Core Changes |
 |:---|:---|:---|
+| v1.13.0 | 2026-04-22 | **Added Context Awareness Mechanism**: Entry Gate protocol adds question ID tracking to distinguish "response to expert questions" from "new intent input"; **Added Question ID Tracking**: Expert questions must be tagged with [Q1], [Q2] format |
 | v1.12.0 | 2026-04-21 | **Strengthened document modification trigger rules**: Any document modification or new requirement must trigger complete expert mode workflow; **Added document modification intent recognition**: Entry Gate protocol includes modification opinion recognition and response templates |
 | v1.11.0 | 2026-04-21 | **Added Custom Template Support**: `/templates/customized/` directory with priority retrieval; **Added Expert Intelligent Matching**: Auto-select best 3 experts from 16-expert library for custom templates |
 | v1.10.0 | 2026-04-21 | **Added Stage 0**: Entry Gate protocol, mandatory intent recognition for all user inputs; **Added Frontend Specification**: PRD template with 8 page structure definitions; **Strengthened Audit**: Missing frontend spec = P0 defect |
