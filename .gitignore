@@ -28,4 +28,4 @@ Thumbs.db
 node_modules/
 
 # Logs
-*.log
+*.log.claude/
