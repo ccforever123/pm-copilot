@@ -1,0 +1,648 @@
+﻿<!doctype html>
+<html lang="zh-CN"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>【项目名称】需求说明</title>
+  <style>
+    :root{
+      --nav:#0a3561;--nav-soft:#0f477e;--ink:#1f2a3a;--muted:#65758b;--line:#d8e2ef;
+      --bg:#f4f7fb;--card:#fff;--head:#edf6ff;--blue:#0b58a4;--green:#0e9f61;
+      --orange:#d97706;--red:#d92d3a;--code:#f7fafc;
+      --font:"Microsoft YaHei","Segoe UI",Arial,sans-serif;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.72}
+    a{color:var(--blue);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .shell{display:grid;grid-template-columns:268px minmax(0,1fr);min-height:100vh}
+    .toc{position:sticky;top:0;height:100vh;overflow:auto;background:var(--nav);color:#d8eaff;padding:22px 18px}
+    .toc-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 10px}
+    .toc h1{margin:0;color:#fff;font-size:22px;line-height:1.25}
+    .toc .version{display:inline-flex;align-items:center;height:24px;padding:0 9px;border:1px solid rgba(185,215,242,.45);border-radius:999px;background:rgba(255,255,255,.1);color:#d8eaff;font-size:12px;font-weight:700;white-space:nowrap}
+    .toc .sub{margin:0 0 18px;color:#a9c9e8;font-size:12px}
+    .toc a{display:block;color:#d8eaff;border-radius:6px;padding:7px 10px;margin:2px 0;text-decoration:none}
+    .toc-section{margin:4px 0}
+    .toc-main{width:100%;display:flex;align-items:center;gap:8px;border:0;background:transparent;color:#eef7ff;border-radius:8px;padding:8px 10px;text-align:left;cursor:pointer;font:inherit;font-size:14px;font-weight:700;letter-spacing:0;position:relative;transition:background .16s ease,color .16s ease,transform .16s ease}
+    .toc-main:before{content:"";width:3px;height:18px;border-radius:3px;background:rgba(156,201,255,.72);opacity:.55;flex:0 0 auto}
+    .toc-main:hover,.toc-sub a:hover{background:rgba(255,255,255,.08);color:#fff;text-decoration:none}
+    .toc-main:hover{transform:translateX(2px)}
+    .toc-main .arrow{width:14px;color:#9cc9ff;font-size:11px;transition:transform .16s ease}
+    .toc-main .title{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .toc-jump{height:24px;min-width:42px;border:1px solid rgba(185,215,242,.42);border-radius:12px;background:rgba(255,255,255,.1);color:#d8eaff;font-size:12px;font-weight:700;cursor:pointer}
+    .toc-jump:hover{background:#eef6ff;color:var(--blue)}
+    .toc .toc-proto{display:inline-flex;align-items:center;justify-content:center;margin:0;padding:3px 9px;border:1px solid rgba(185,215,242,.42);border-radius:11px;background:rgba(255,255,255,.1);color:#d8eaff;font-size:12px;font-weight:700;line-height:1;text-decoration:none;white-space:nowrap;flex-shrink:0;transition:background .15s,color .15s}
+    .toc .toc-proto:hover{background:#eef6ff;color:var(--blue);text-decoration:none}
+    .toc-section.collapsed .toc-main .arrow{transform:rotate(-90deg)}
+    .toc-section.active .toc-main{background:linear-gradient(90deg,rgba(47,128,237,.32),rgba(255,255,255,.08));color:#fff}
+    .toc-section.active .toc-main:before{opacity:1;background:#9cc9ff}
+    .toc-sub{display:grid;gap:1px;margin:5px 0 8px 24px}
+    .toc-section.collapsed .toc-sub{display:none}
+    .toc-sub a{display:block;color:#bdd8f2;border-radius:6px;padding:5px 8px;font-size:13px;line-height:1.35}
+    .toc-sub a.active{background:rgba(255,255,255,.12);color:#fff;font-weight:700}
+    .toc a:hover{background:var(--nav-soft);color:#fff}
+    .toc .group{margin:16px 0 6px;padding:0 10px;color:#7fb6ea;font-size:12px;font-weight:700}
+    .doc{width:100%;max-width:none;padding:30px 34px 64px}
+    .hero{background:#fff;border:1px solid var(--line);border-left:6px solid var(--blue);border-radius:8px;padding:26px 30px;margin-bottom:18px;box-shadow:0 12px 28px rgba(31,49,77,.08)}
+    .hero h2{font-size:30px;margin:0 0 8px;color:#123a65}
+    .hero p{margin:0;color:var(--muted)}
+    .meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:18px}
+    .meta div{background:#f8fbff;border:1px solid var(--line);border-radius:6px;padding:10px 12px}
+    .meta b{display:block;color:#123a65;font-size:12px}
+    section{scroll-margin-top:18px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:8px;margin:14px 0;padding:22px 24px;box-shadow:0 8px 20px rgba(31,49,77,.05);overflow-x:auto}
+    h2{margin:0 0 14px;font-size:23px;color:#123a65}
+    h3{margin:22px 0 8px;font-size:17px;color:#26384f}
+    h4{margin:18px 0 8px;font-size:15px;color:#334155}
+    p{margin:8px 0}
+    ul{margin:8px 0 8px 22px;padding:0}
+    li{margin:3px 0}
+    table{width:100%;min-width:980px;border-collapse:collapse;margin:10px 0 6px;table-layout:auto}
+    th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top;font-size:14px;line-height:1.52}
+    th{background:var(--head);color:#123a65}
+    th:first-child,td:first-child{width:1%;white-space:nowrap}
+    td code{white-space:nowrap}
+    code{background:var(--code);border:1px solid #e2e8f0;border-radius:4px;padding:1px 5px;color:#334155}
+    pre{background:var(--code);border:1px solid #e2e8f0;border-radius:6px;padding:12px;overflow:auto}
+    .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+    .note{border-left:4px solid var(--blue);background:#f8fbff;padding:12px 14px;color:#334155;margin:12px 0}
+    .warn{border-left-color:var(--orange);background:#fff8ed}
+    .risk{border-left-color:var(--red);background:#fff5f6}
+    .tag{display:inline-block;border:1px solid #bfdbfe;background:#eef6ff;color:#0b58a4;border-radius:12px;padding:1px 8px;font-size:12px}
+    .test-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0}
+    .test-card{border:1px solid var(--line);border-radius:6px;background:#fbfdff;padding:12px 14px}
+    .test-card b{display:block;margin-bottom:4px;color:#123a65}
+    .review-rule{border:1px solid #bfdbfe;background:#f8fbff;border-radius:6px;padding:10px 12px;margin:8px 0}
+    .review-rule strong{color:var(--blue)}
+    .checklist-status{display:inline-flex;align-items:center;min-height:22px;padding:1px 8px;border-radius:12px;font-size:12px;font-weight:700;white-space:nowrap}
+    .checklist-status.must{background:#ecfdf3;color:var(--green);border:1px solid #b7e4c7}
+    .checklist-status.should{background:#fff8ed;color:var(--orange);border:1px solid #fed7aa}
+    .checklist-status.blocked{background:#fff5f6;color:var(--red);border:1px solid #fecdd3}
+    .proto{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+    .proto a{display:inline-flex;align-items:center;height:32px;padding:0 12px;border:1px solid #9cc9ff;background:#eef6ff;border-radius:6px;font-weight:700}
+    .flow{display:grid;gap:8px;counter-reset:step;margin:10px 0}
+    .step{position:relative;border:1px solid var(--line);border-radius:6px;background:#fbfdff;padding:10px 12px 10px 44px}
+    .step:before{counter-increment:step;content:counter(step);position:absolute;left:12px;top:12px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--blue);color:#fff;font-size:12px;font-weight:700}
+    .status-ok{color:var(--green);font-weight:700}.status-warn{color:var(--orange);font-weight:700}.status-risk{color:var(--red);font-weight:700}
+    body.editing section[contenteditable="true"]{outline:0}
+    body.editing section[contenteditable="true"]:hover{box-shadow:0 0 0 2px rgba(11,88,164,.12),0 8px 20px rgba(31,49,77,.05)}
+    body.editing section[contenteditable="true"]:focus{box-shadow:0 0 0 2px rgba(11,88,164,.28),0 10px 24px rgba(31,49,77,.08)}
+    body:not(.editing) main.doc > section{cursor:text}
+    body:not(.editing) main.doc > section:hover{box-shadow:0 0 0 2px rgba(11,88,164,.10),0 8px 20px rgba(31,49,77,.05);transition:box-shadow .18s ease}
+    .doc-savebar{position:fixed;right:24px;top:18px;z-index:60;display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid #b8d8ff;border-radius:8px;background:rgba(255,255,255,.96);box-shadow:0 10px 28px rgba(31,49,77,.16);backdrop-filter:blur(8px)}
+    .doc-savebar button{height:34px;border:0;border-radius:6px;background:var(--blue);color:#fff;padding:0 14px;font-weight:700;cursor:pointer}
+    .doc-savebar .cancel{background:#edf2f7;color:#566375;box-shadow:none}
+    .doc-savebar button:disabled{background:#9db8d5;cursor:not-allowed}
+    .doc-savebar .save-state{min-width:90px;color:var(--muted);font-size:12px;white-space:nowrap}
+    .doc-savebar[hidden]{display:none!important}
+    .doc-savebar [hidden]{display:none}
+    @media(max-width:980px){.shell{grid-template-columns:1fr}.toc{position:relative;height:auto}.doc{padding:18px 14px 42px}.meta,.grid2,.grid3,.test-grid{grid-template-columns:1fr}table{min-width:900px}}
+  </style>
+</head>
+<body class="">
+  <div class="doc-savebar" contenteditable="false">
+    <span class="save-state" id="saveState">只读</span>
+    <button type="button" id="saveDocBtn" hidden="">保存</button>
+    <button type="button" class="cancel" id="cancelEditBtn" hidden="">取消</button>
+  </div>
+  <div class="shell">
+    <aside class="toc">
+      <div class="toc-title"><h1>【项目名称】</h1><span class="version">V1.0</span></div>
+      <p class="sub">【技术栈简述，如：React + Node.js】</p>
+      <div id="tocTree"></div>
+    </aside>
+
+    <main class="doc">
+
+      <!-- ========== 总览 ========== -->
+
+      <section class="hero" id="overview">
+        <h2>【项目名称】V1.0 需求说明</h2>
+        <p>【一句话描述本文档的目的。例如：本文件根据当前 PRD 和原型页面整理，目标是让产品、设计、前端、后端、测试在同一份 HTML 文档里看到可落地的页面、交互、逻辑和验收要求。】</p>
+        <div class="meta">
+          <div><b>文档版本</b>1.0</div>
+          <div><b>更新日期</b>YYYY-MM-DD</div>
+          <div><b>文档状态</b>【草稿 / 评审中 / 已确认】</div>
+          <div><b>适用对象</b>【产品、设计、前端、后端、测试】</div>
+        </div>
+        <div class="proto">
+          <a href="#">打开【页面A】原型</a>
+          <a href="#">打开【页面B】原型</a>
+        </div>
+        <p class="note">【更新说明，用结构化的方式展示。例如：</p><p class="note">1. 本期需求仅覆盖 XX 模块</p><p class="note">2. YY 功能移至下一期。】</p>
+      </section>
+
+      <section class="card" id="scope">
+        <h2>2. 范围与角色</h2>
+        <h3 id="scope-2.1-业务目标">2.1 业务目标</h3>
+        <p>【描述本项目核心业务目标。】</p>
+        <table>
+          <tbody><tr><th>目标</th><th>实现说明</th><th>关注点</th></tr>
+          <tr><td>【目标1】</td><td>【实现说明】</td><td>【需关注的技术或设计要点】</td></tr>
+          <tr><td>【目标2】</td><td>【实现说明】</td><td>【需关注的技术或设计要点】</td></tr>
+          <tr><td>【目标3】</td><td>【实现说明】</td><td>【需关注的技术或设计要点】</td></tr>
+        </tbody></table>
+        <h3 id="scope-2.2-角色与权限">2.2 角色与权限</h3>
+        <table>
+          <tbody><tr><th>角色</th><th>当前版本能力</th><th>权限说明</th></tr>
+          <tr><td>【角色1，如：普通用户】</td><td>【该角色可使用的功能列表】</td><td>【权限范围说明】</td></tr>
+          <tr><td>【角色2，如：管理员】</td><td>【该角色可使用的功能列表】</td><td>【权限范围说明】</td></tr>
+        </tbody></table>
+      </section>
+
+      <section class="card" id="navigation">
+        <h2>3. 页面与跳转</h2>
+        <p>【描述整体页面结构和导航逻辑。】</p>
+        <table>
+          <tbody><tr><th>页面</th><th>原型链接</th><th>入口</th><th>跳转规则</th></tr>
+          <tr><td>【页面A】</td><td><a href="#">prototype/page-a.html</a></td><td>【如：顶部菜单"首页"】</td><td>【跳转与进入逻辑描述】</td></tr>
+          <tr><td>【页面B】</td><td><a href="#">prototype/page-b.html</a></td><td>【如：点击"新建"按钮】</td><td>【跳转与进入逻辑描述】</td></tr>
+          <tr><td>【页面C】</td><td><a href="#">prototype/page-c.html</a></td><td>【如：左侧菜单"设置"】</td><td>【跳转与进入逻辑描述】</td></tr>
+        </tbody></table>
+        <h3 id="navigation-3.1-全局导航要求">3.1 全局导航要求</h3>
+        <ul>
+          <li>【全局导航规则1，如：所有页面顶部导航必须高亮当前页菜单项。】</li>
+          <li>【全局导航规则2，如：移动端收起侧边栏，展示汉堡菜单。】</li>
+          <li>【全局导航规则3，如：面包屑导航层级不超过三级。】</li>
+        </ul>
+      </section>
+
+      <!-- ========== 页面需求 ========== -->
+
+      <section class="card" id="page-a">
+        <h2>4. 【页面A名称】页面</h2>
+        <div class="proto"><a href="#">查看对应原型：page-a.html</a></div>
+        <h3 id="page-a-4.1-页面目标">4.1 页面目标</h3>
+        <p>【描述该页面的核心功能和用户目标。】</p>
+        <h3 id="page-a-4.2-页面区域">4.2 页面区域</h3>
+        <table>
+          <tbody><tr><th>区域</th><th>字段 / 组件</th><th>展示逻辑</th><th>交互逻辑</th></tr>
+          <tr><td>【区域1，如：顶部筛选栏】</td><td>【包含的字段或组件】</td><td>【何时展示、默认状态】</td><td>【用户操作后发生什么】</td></tr>
+          <tr><td>【区域2，如：数据列表】</td><td>【包含的字段或组件】</td><td>【何时展示、默认状态】</td><td>【用户操作后发生什么】</td></tr>
+          <tr><td>【区域3，如：详情弹窗】</td><td>【包含的字段或组件】</td><td>【何时展示、默认状态】</td><td>【用户操作后发生什么】</td></tr>
+        </tbody></table>
+        <h3 id="page-a-4.3-列表字段">4.3 列表字段</h3>
+        <table>
+          <tbody><tr><th>字段</th><th>类型</th><th>说明</th><th>前端展示规则</th></tr>
+          <tr><td>【字段1】</td><td>【String / Number / Enum / DateTime / Boolean / Action】</td><td>【字段业务含义】</td><td>【展示格式、截断规则、空值处理等】</td></tr>
+          <tr><td>【字段2】</td><td>【类型】</td><td>【字段业务含义】</td><td>【展示规则】</td></tr>
+          <tr><td>【字段3】</td><td>【类型】</td><td>【字段业务含义】</td><td>【展示规则】</td></tr>
+          <tr><td>操作</td><td>Action</td><td>针对当前行的操作入口。</td><td>只显示主按钮，其余收入"更多"，避免横向堆叠。</td></tr>
+        </tbody></table>
+        <h3 id="page-a-4.4-状态与操作规则">4.4 状态与操作规则</h3>
+        <table>
+          <tbody><tr><th>状态</th><th>主操作</th><th>更多操作</th><th>动作逻辑</th></tr>
+          <tr><td>【状态1，如：待处理】</td><td>【主操作按钮文案】</td><td>【更多操作列表】</td><td>【点击后的业务逻辑】</td></tr>
+          <tr><td>【状态2，如：进行中】</td><td>【主操作按钮文案】</td><td>【更多操作列表】</td><td>【点击后的业务逻辑】</td></tr>
+          <tr><td>【状态3，如：已完成】</td><td>【主操作按钮文案】</td><td>【更多操作列表】</td><td>【点击后的业务逻辑】</td></tr>
+          <tr><td>【状态4，如：失败】</td><td>【主操作按钮文案】</td><td>【更多操作列表】</td><td>【点击后的业务逻辑】</td></tr>
+        </tbody></table>
+        <h3 id="page-a-4.5-核心操作流程">4.5 核心操作流程</h3>
+        <div class="flow">
+          <div class="step">【流程步骤1，如：用户点击"新建"，打开创建弹窗。】</div>
+          <div class="step">【流程步骤2，如：用户填写表单必填项并选择类型。】</div>
+          <div class="step">【流程步骤3，如：前端校验表单，通过后提交至后端。】</div>
+          <div class="step">【流程步骤4，如：后端处理成功后返回新记录 ID。】</div>
+          <div class="step">【流程步骤5，如：前端关闭弹窗，刷新列表，新记录置顶显示。】</div>
+        </div>
+        <h3 id="page-a-4.6-表单校验">4.6 表单校验</h3>
+        <table>
+          <tbody><tr><th>字段</th><th>必填</th><th>校验规则</th><th>错误提示</th></tr>
+          <tr><td>【字段1】</td><td>是</td><td>【校验规则，如：不超过 50 个字符，不可包含特殊符号。】</td><td>【错误提示文案】</td></tr>
+          <tr><td>【字段2】</td><td>是</td><td>【校验规则】</td><td>【错误提示文案】</td></tr>
+          <tr><td>【字段3】</td><td>否</td><td>【校验规则，如：若填写，须为有效 URL 格式。】</td><td>【错误提示文案】</td></tr>
+        </tbody></table>
+        <h3 id="page-a-4.7-前端状态">4.7 前端状态</h3>
+        <table>
+          <tbody><tr><th>状态</th><th>触发条件</th><th>页面表现</th><th>允许操作</th></tr>
+          <tr><td>加载中</td><td>页面初次加载或数据刷新中。</td><td>列表区展示骨架屏或 Loading 动画。</td><td>不允许提交操作。</td></tr>
+          <tr><td>空状态</td><td>当前筛选条件下无数据。</td><td>展示空状态插图和引导文案。</td><td>可清除筛选条件或新建。</td></tr>
+          <tr><td>正常</td><td>数据加载成功。</td><td>展示完整列表和操作。</td><td>所有操作可用。</td></tr>
+          <tr><td>错误</td><td>接口请求失败。</td><td>展示错误提示和重试按钮。</td><td>可重试加载。</td></tr>
+        </tbody></table>
+        <h3 id="page-a-4.8-开发验收">4.8 开发验收</h3>
+        <ul>
+          <li>【验收点1，如：列表默认按更新时间降序排列，支持按状态筛选。】</li>
+          <li>【验收点2，如：操作权限与角色绑定，非管理员不可见"删除"操作。】</li>
+          <li>【验收点3，如：表单提交失败时，弹窗不关闭，保留已填内容。】</li>
+        </ul>
+      </section>
+
+      <section class="card" id="page-b">
+        <h2>5. 【页面B名称】页面</h2>
+        <div class="proto"><a href="#">查看对应原型：page-b.html</a></div>
+        <h3 id="page-b-5.1-页面目标">5.1 页面目标</h3>
+        <p>【描述该页面的核心功能和用户目标。】</p>
+        <h3 id="page-b-5.2-页面视图">5.2 页面视图</h3>
+        <table>
+          <tbody><tr><th>视图</th><th>触发方式</th><th>展示内容</th><th>退出方式</th></tr>
+          <tr><td>【视图1，如：默认列表视图】</td><td>【触发方式，如：打开页面默认进入】</td><td>【展示的主要内容】</td><td>【退出或切换方式】</td></tr>
+          <tr><td>【视图2，如：详情视图】</td><td>【触发方式，如：点击列表行进入】</td><td>【展示的主要内容】</td><td>【退出或切换方式，如：点击返回】</td></tr>
+        </tbody></table>
+        <h3 id="page-b-5.3-核心字段">5.3 核心字段</h3>
+        <table>
+          <tbody><tr><th>字段</th><th>类型</th><th>说明</th><th>前端展示规则</th></tr>
+          <tr><td>【字段1】</td><td>【类型】</td><td>【说明】</td><td>【展示规则】</td></tr>
+          <tr><td>【字段2】</td><td>【类型】</td><td>【说明】</td><td>【展示规则】</td></tr>
+          <tr><td>【字段3】</td><td>【类型】</td><td>【说明】</td><td>【展示规则】</td></tr>
+        </tbody></table>
+        <h3 id="page-b-5.4-交互流程">5.4 交互流程</h3>
+        <div class="flow">
+          <div class="step">【流程步骤1】</div>
+          <div class="step">【流程步骤2】</div>
+          <div class="step">【流程步骤3】</div>
+          <div class="step">【流程步骤4】</div>
+        </div>
+        <h3 id="page-b-5.5-开发验收">5.5 开发验收</h3>
+        <ul>
+          <li>【验收点1】</li>
+          <li>【验收点2】</li>
+          <li>【验收点3】</li>
+        </ul>
+      </section>
+
+      <section class="card" id="page-c">
+        <h2>6. 【页面C名称】页面</h2>
+        <div class="proto"><a href="#">查看对应原型：page-c.html</a></div>
+        <h3 id="page-c-6.1-页面目标">6.1 页面目标</h3>
+        <p>【描述该页面的核心功能和用户目标。】</p>
+        <h3 id="page-c-6.2-页面区域">6.2 页面区域</h3>
+        <table>
+          <tbody><tr><th>区域</th><th>字段 / 组件</th><th>展示逻辑</th><th>交互逻辑</th></tr>
+          <tr><td>【区域1】</td><td>【字段或组件】</td><td>【展示逻辑】</td><td>【交互逻辑】</td></tr>
+          <tr><td>【区域2】</td><td>【字段或组件】</td><td>【展示逻辑】</td><td>【交互逻辑】</td></tr>
+        </tbody></table>
+        <h3 id="page-c-6.3-操作流程">6.3 操作流程</h3>
+        <div class="flow">
+          <div class="step">【流程步骤1】</div>
+          <div class="step">【流程步骤2】</div>
+          <div class="step">【流程步骤3】</div>
+        </div>
+        <h3 id="page-c-6.4-开发验收">6.4 开发验收</h3>
+        <ul>
+          <li>【验收点1】</li>
+          <li>【验收点2】</li>
+        </ul>
+      </section>
+
+      <!-- ========== 测试与验收 ========== -->
+
+      <section class="card" id="common-exceptions">
+        <h2>7. 通用异常处理</h2>
+        <p class="note">【说明系统在网络、权限、服务、数据、并发等通用异常下的统一处理规则，避免各页面自行定义不一致的反馈。】</p>
+        <table>
+          <tbody><tr><th>异常类型</th><th>触发条件</th><th>用户提示</th><th>系统处理</th><th>验收标准</th></tr>
+          <tr><td>网络异常</td><td>【接口超时、断网、弱网】</td><td>【展示友好提示和重试入口】</td><td>【保留页面状态，不重复提交】</td><td>【不白屏、不丢失已填写内容】</td></tr>
+          <tr><td>服务异常</td><td>【接口返回 5xx 或服务不可用】</td><td>【提示稍后重试，不暴露技术细节】</td><td>【记录错误码，支持重试或降级】</td><td>【错误可恢复，日志可追踪】</td></tr>
+          <tr><td>权限异常</td><td>【接口返回 401 / 403】</td><td>【提示登录失效或无权限】</td><td>【跳转登录、禁用入口或提示联系管理员】</td><td>【无权限用户无法绕过操作】</td></tr>
+          <tr><td>数据异常</td><td>【数据为空、缺字段、格式非法】</td><td>【按空态、缺省值或错误提示展示】</td><td>【前端容错，后端返回明确错误】</td><td>【页面可继续使用】</td></tr>
+        </tbody></table>
+      </section>
+
+      <section class="card" id="boundary-logic">
+        <h2>8. 边界处理逻辑</h2>
+        <div class="test-grid">
+          <div class="test-card"><b>输入边界</b>【最大长度、最小值、特殊字符、空值、重复值、非法格式等输入处理规则。】</div>
+          <div class="test-card"><b>数据边界</b>【空列表、大数据量、分页末页、删除后无数据、状态缺失等展示处理规则。】</div>
+          <div class="test-card"><b>操作边界</b>【重复点击、并发提交、撤销后重试、跨页面返回等交互处理规则。】</div>
+          <div class="test-card"><b>权限边界</b>【角色切换、权限变更、登录过期、只读状态等访问控制处理规则。】</div>
+        </div>
+        <table>
+          <tbody><tr><th>边界场景</th><th>触发条件</th><th>处理逻辑</th><th>验收标准</th></tr>
+          <tr><td>必填为空</td><td>【用户未填写必填项提交】</td><td>【阻止提交，字段下方展示错误提示】</td><td>【错误定位清晰，修正后可提交】</td></tr>
+          <tr><td>最大长度</td><td>【输入超过字段限制】</td><td>【限制继续输入或提交时报错】</td><td>【前后端规则一致】</td></tr>
+          <tr><td>重复提交</td><td>【用户连续点击提交按钮】</td><td>【按钮 loading / disabled，后端幂等处理】</td><td>【只产生一条有效记录】</td></tr>
+          <tr><td>空状态</td><td>【筛选或初始化后无数据】</td><td>【展示空态和可执行引导】</td><td>【不展示错误态】</td></tr>
+        </tbody></table>
+      </section>
+
+      <section class="card" id="output-review">
+        <h2>9. 输出审查规则</h2>
+        <div class="review-rule"><strong>内容完整性：</strong>【检查页面字段、状态、按钮、提示语、空态、错误态是否覆盖需求文档定义。】</div>
+        <div class="review-rule"><strong>逻辑一致性：</strong>【检查原型、需求文档、接口约束、权限规则是否相互一致，无冲突描述。】</div>
+        <div class="review-rule"><strong>表达可实现性：</strong>【检查描述是否足够具体，开发可直接实现，测试可直接编写用例。】</div>
+        <div class="review-rule"><strong>风险显性化：</strong>【检查高风险能力是否标注依赖、限制、降级方案和验收条件。】</div>
+        <table>
+          <tbody><tr><th>审查项</th><th>审查方式</th><th>通过标准</th><th>不通过处理</th></tr>
+          <tr><td>字段覆盖</td><td>【逐页核对页面区域和字段表】</td><td>【无遗漏、无多余关键字段】</td><td>【补充字段说明或调整原型】</td></tr>
+          <tr><td>交互闭环</td><td>【核对核心流程、异常流程、返回路径】</td><td>【每个用户动作都有明确结果】</td><td>【补齐流程步骤和异常处理】</td></tr>
+          <tr><td>权限一致</td><td>【按角色核对入口、按钮、接口权限】</td><td>【前端展示与后端授权一致】</td><td>【明确角色矩阵并调整规则】</td></tr>
+          <tr><td>文案可用</td><td>【核对提示语、错误信息、空态引导】</td><td>【用户能理解下一步操作】</td><td>【替换含糊或技术化文案】</td></tr>
+        </tbody></table>
+      </section>
+
+      <section class="card" id="acceptance">
+        <h2>10. 验收清单</h2>
+        <table>
+          <tbody><tr><th>模块</th><th>验收点</th><th>验收级别</th><th>结果记录</th></tr>
+          <tr><td>全局导航</td><td>【所有页面菜单高亮正确，无死链，返回路径明确。】</td><td><span class="checklist-status must">必须通过</span></td><td>【通过 / 不通过 / 待确认】</td></tr>
+          <tr><td>【页面A】</td><td>【该页面核心验收要点的精简描述。】</td><td><span class="checklist-status must">必须通过</span></td><td>【记录问题或验收结论】</td></tr>
+          <tr><td>【页面B】</td><td>【该页面核心验收要点的精简描述。】</td><td><span class="checklist-status must">必须通过</span></td><td>【记录问题或验收结论】</td></tr>
+          <tr><td>【页面C】</td><td>【该页面核心验收要点的精简描述。】</td><td><span class="checklist-status should">建议通过</span></td><td>【记录问题或验收结论】</td></tr>
+          <tr><td>阻断问题</td><td>【上线前必须解决的异常、权限、数据一致性问题。】</td><td><span class="checklist-status blocked">阻断上线</span></td><td>【负责人、解决版本、复测结论】</td></tr>
+        </tbody></table>
+      </section>
+
+    </main>
+  </div>
+  <script>
+    (() => {
+      const fileName = "需求说明文档模板.html";
+      const saveBtn = document.getElementById("saveDocBtn");
+      const cancelBtn = document.getElementById("cancelEditBtn");
+      const saveState = document.getElementById("saveState");
+      const tocTree = document.getElementById("tocTree");
+      const docMain = document.querySelector("main.doc");
+      let fileHandle = null;
+      let dirty = false;
+      let editing = false;
+      let editSnapshot = "";
+      let tocSectionLinks = [];
+      let tocSubLinks = [];
+      let scrollTicking = false;
+      let programmaticScroll = false;
+      let programmaticTimer = null;
+      let activeTocId = "";
+      let activeSubId = "";
+
+      // 侧边栏分组规则：section id → 分组名称
+      const getGroupName = (sectionId, index) => {
+        if (index <= 2) return "总览";
+        if (["page-a", "page-b", "page-c"].includes(sectionId)) return "页面需求";
+        return "测试与验收";
+      };
+
+      const setState = (text) => {
+        const isReadonly = text === "只读";
+        saveState.hidden = isReadonly;
+        saveState.textContent = text;
+      };
+
+      const slugify = (text, fallback) => {
+        const cleaned = text.trim().replace(/\s+/g, "-").replace(/[^\w\u4e00-\u9fa5.-]/g, "");
+        return cleaned || fallback;
+      };
+
+      const ensureHeadingId = (heading, sectionId, index) => {
+        if (heading.parentElement && heading.parentElement !== heading.closest("section") && heading.parentElement.id) {
+          return heading.parentElement.id;
+        }
+        if (!heading.id) {
+          heading.id = `${sectionId}-${slugify(heading.textContent, `sub-${index}`)}`;
+        }
+        return heading.id;
+      };
+
+      const buildToc = () => {
+        tocTree.innerHTML = "";
+        tocSectionLinks = [];
+        tocSubLinks = [];
+        let currentGroup = "";
+        document.querySelectorAll("main.doc > section").forEach((section, index) => {
+          const groupName = getGroupName(section.id, index);
+          if (groupName !== currentGroup) {
+            currentGroup = groupName;
+            const group = document.createElement("div");
+            group.className = "group";
+            group.textContent = groupName;
+            tocTree.appendChild(group);
+          }
+
+          const h2 = section.querySelector(":scope > h2");
+          if (!h2) return;
+
+          const wrapper = document.createElement("div");
+          wrapper.className = "toc-section collapsed";
+
+          const mainButton = document.createElement("button");
+          mainButton.className = "toc-main";
+          mainButton.type = "button";
+          const protoAnchor = section.querySelector(":scope > .proto a");
+          const protoHref = protoAnchor ? protoAnchor.getAttribute("href") : null;
+          const showProto = groupName === "页面需求" && protoHref;
+          mainButton.innerHTML = `<span class="arrow">▾</span><span class="title"></span>${showProto ? `<a class="toc-proto" href="${protoHref}" target="_blank" rel="noopener">原型</a>` : ""}`;
+          const title = mainButton.querySelector(".title");
+          title.textContent = section.id === "overview" ? "1. 文档说明" : h2.textContent.trim();
+
+          const subList = document.createElement("div");
+          subList.className = "toc-sub";
+          const h3List = Array.from(section.querySelectorAll("h3"));
+          h3List.forEach((h3, h3Index) => {
+            const link = document.createElement("a");
+            const h3Id = ensureHeadingId(h3, section.id, h3Index);
+            link.href = `#${h3Id}`;
+            link.textContent = h3.textContent.trim();
+            link.addEventListener("click", (event) => {
+              event.preventDefault();
+              scrollToDocTarget(h3, section.id, h3Id);
+            });
+            subList.appendChild(link);
+            tocSubLinks.push({ id: h3Id, link, heading: h3 });
+          });
+
+          mainButton.addEventListener("click", (e) => {
+            if (e.target.closest(".toc-proto")) return;
+            scrollToDocTarget(section, section.id, "");
+          });
+
+          wrapper.appendChild(mainButton);
+          if (h3List.length) wrapper.appendChild(subList);
+          tocTree.appendChild(wrapper);
+          tocSectionLinks.push({ id: section.id, wrapper, section });
+        });
+      };
+
+      const setActiveTocSection = (sectionId, reveal = false) => {
+        const changed = activeTocId !== sectionId;
+        activeTocId = sectionId;
+        tocSectionLinks.forEach(({ id, wrapper }) => {
+          const active = id === sectionId;
+          wrapper.classList.toggle("active", active);
+          wrapper.classList.toggle("collapsed", !active);
+          if (active && reveal && changed) {
+            wrapper.scrollIntoView({ block: "nearest" });
+          }
+        });
+      };
+
+      const setActiveSubLink = (subId) => {
+        activeSubId = subId || "";
+        tocSubLinks.forEach(({ id, link }) => {
+          link.classList.toggle("active", id === activeSubId);
+        });
+      };
+
+      const scrollToDocTarget = (target, sectionId, subId) => {
+        programmaticScroll = true;
+        window.clearTimeout(programmaticTimer);
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        if (history.pushState) {
+          history.pushState(null, "", `#${subId || sectionId}`);
+        }
+        programmaticTimer = window.setTimeout(() => {
+          setActiveTocSection(sectionId, true);
+          setActiveSubLink(subId);
+          programmaticScroll = false;
+        }, 650);
+      };
+
+      const updateTocByScroll = () => {
+        if (programmaticScroll) return;
+        const offset = 120;
+        let activeSection = tocSectionLinks[0];
+        tocSectionLinks.forEach((item) => {
+          if (item.section.getBoundingClientRect().top <= offset) activeSection = item;
+        });
+        if (!activeSection) return;
+        setActiveTocSection(activeSection.id, true);
+
+        let activeSub = null;
+        tocSubLinks.forEach((item) => {
+          if (item.heading.getBoundingClientRect().top <= offset) activeSub = item;
+        });
+        setActiveSubLink(activeSub && activeSub.heading.closest("section")?.id === activeSection.id ? activeSub.id : "");
+      };
+
+      const setToolbar = () => {
+        saveBtn.hidden = !editing;
+        cancelBtn.hidden = !editing;
+        document.querySelector(".doc-savebar").hidden = !editing;
+      };
+
+      const markDirty = () => {
+        if (!editing) return;
+        dirty = true;
+        setState("有未保存修改");
+      };
+
+      const enterEdit = () => {
+        if (editing) return;
+        editSnapshot = docMain.innerHTML;
+        dirty = false;
+        setEditable(true);
+      };
+
+      const setEditable = (enabled) => {
+        editing = enabled;
+        document.body.classList.toggle("editing", enabled);
+        document.querySelectorAll("main.doc > section").forEach((section) => {
+          if (enabled) {
+            section.setAttribute("contenteditable", "true");
+            section.setAttribute("spellcheck", "false");
+            section.setAttribute("tabindex", "0");
+            section.addEventListener("input", markDirty);
+            section.removeEventListener("dblclick", enterEdit);
+          } else {
+            section.removeAttribute("contenteditable");
+            section.removeAttribute("spellcheck");
+            section.removeAttribute("tabindex");
+            section.removeEventListener("input", markDirty);
+            section.addEventListener("dblclick", enterEdit);
+          }
+        });
+        setToolbar();
+        setState(enabled ? "编辑中" : "只读");
+      };
+
+      const buildHtml = () => {
+        const clone = document.documentElement.cloneNode(true);
+        const clonedState = clone.querySelector("#saveState");
+        const clonedSaveBtn = clone.querySelector("#saveDocBtn");
+        const clonedCancelBtn = clone.querySelector("#cancelEditBtn");
+        clone.querySelector("body").classList.remove("editing");
+        clone.querySelectorAll("main.doc > section").forEach((section) => {
+          section.removeAttribute("contenteditable");
+          section.removeAttribute("spellcheck");
+          section.removeAttribute("tabindex");
+        });
+        if (clonedState) clonedState.textContent = "只读";
+        if (clonedSaveBtn) { clonedSaveBtn.hidden = true; clonedSaveBtn.removeAttribute("disabled"); }
+        if (clonedCancelBtn) clonedCancelBtn.hidden = true;
+        return "<!doctype html>\n" + clone.outerHTML + "\n";
+      };
+
+      const downloadFallback = (content) => {
+        const blob = new Blob([content], { type: "text/html;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+      };
+
+      const saveToFile = async () => {
+        const content = buildHtml();
+        if (!window.showSaveFilePicker) {
+          downloadFallback(content);
+          dirty = false;
+          setEditable(false);
+          setState("已下载副本");
+          return;
+        }
+        if (!fileHandle) {
+          fileHandle = await window.showSaveFilePicker({
+            suggestedName: fileName,
+            types: [{ description: "HTML 文档", accept: { "text/html": [".html"] } }]
+          });
+        }
+        const writable = await fileHandle.createWritable();
+        await writable.write(content);
+        await writable.close();
+        dirty = false;
+        setEditable(false);
+        setState("已保存");
+      };
+
+      saveBtn.addEventListener("click", async () => {
+        saveBtn.disabled = true;
+        setState("保存中...");
+        try {
+          await saveToFile();
+        } catch (error) {
+          if (error && error.name === "AbortError") {
+            setState(dirty ? "取消保存" : "未保存");
+          } else {
+            console.error(error);
+            setState("保存失败");
+            alert("保存失败：请确认浏览器允许写入文件，或使用 Chrome/Edge 打开后重新选择原 HTML 文件覆盖保存。");
+          }
+        } finally {
+          saveBtn.disabled = false;
+        }
+      });
+
+      cancelBtn.addEventListener("click", () => {
+        if (dirty && !confirm("确认取消编辑？当前未保存的修改将丢失。")) return;
+        docMain.innerHTML = editSnapshot;
+        dirty = false;
+        buildToc();
+        setEditable(false);
+      });
+
+      window.addEventListener("beforeunload", (event) => {
+        if (!editing || !dirty) return;
+        event.preventDefault();
+        event.returnValue = "";
+      });
+
+      window.addEventListener("scroll", () => {
+        if (scrollTicking) return;
+        scrollTicking = true;
+        requestAnimationFrame(() => {
+          updateTocByScroll();
+          scrollTicking = false;
+        });
+      }, { passive: true });
+
+      buildToc();
+      setEditable(false);
+    })();
+  </script>
+
+
+</body></html>
+
