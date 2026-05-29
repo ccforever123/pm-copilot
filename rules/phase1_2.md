@@ -30,8 +30,6 @@
 待确认问题：（无则删除此行）
 ```
 
-用户明确确认阶段一完整正确后，更新 `MEMORY.md`：写入项目背景、已确认决策，清理已解决的待确认问题。
-
 ---
 
 ## 阶段二：生成需求文档
@@ -45,8 +43,8 @@
 5. 更新：`last_checkpoint=phase2_review_in_progress`
 6. 用 Read 工具读取 `rules/review_doc.md`，将 `{文档全文}` 替换为文件完整内容，通过 Task 工具发送给 Sub-Agent
 7. 存储结果至 `last_review_result`，更新 `last_checkpoint=phase2_review_done`
-8. 有 [阻断]/[重要]：展示给用户 → 将未解决项写入 `MEMORY.md` 的待确认问题 → 修复 → 回到步骤 4；仅 [建议] 或通过：展示给用户 → 等待定稿确认
-9. 定稿后写入：`doc_finalized=true`，并更新 `MEMORY.md`：记录文档背后的已确认决策，清理已解决的待确认问题
+8. 有 [阻断]/[重要]：展示给用户 → 修复 → 回到步骤 4；仅 [建议] 或通过：展示给用户 → 等待定稿确认
+9. 定稿后写入：`doc_finalized=true`
 
 无状态文件但只发现文档时：询问"文档是否已定稿？"
 - 已定稿 → 设 `doc_finalized=true`，告知可继续生成原型
