@@ -30,6 +30,8 @@
 待确认问题：（无则删除此行）
 ```
 
+用户明确确认阶段一完整正确后，更新 `MEMORY.md`：写入项目背景、已确认决策，清理已解决的待确认问题。
+
 ---
 
 ## 阶段二：生成需求文档
@@ -43,9 +45,19 @@
 5. 更新：`last_checkpoint=phase2_review_in_progress`
 6. 用 Read 工具读取 `rules/review_doc.md`，将 `{文档全文}` 替换为文件完整内容，通过 Task 工具发送给 Sub-Agent
 7. 存储结果至 `last_review_result`，更新 `last_checkpoint=phase2_review_done`
-8. 有 [阻断]/[重要]：展示给用户 → 修复 → 回到步骤 4；仅 [建议] 或通过：展示给用户 → 等待定稿确认
-9. 定稿后写入：`doc_finalized=true`
+8. 有 [阻断]/[重要]：展示给用户 → 将未解决项写入 `MEMORY.md` 的待确认问题 → 修复 → 回到步骤 4；仅 [建议] 或通过：展示给用户 → 等待定稿确认
+9. 定稿后写入：`doc_finalized=true, last_checkpoint=delivery_choice`，并更新 `MEMORY.md`：记录文档背后的已确认决策，清理已解决的待确认问题
+10. 询问用户选择下一步交付物：
+
+```
+需求文档已定稿。请选择下一步输出：
+
+1. 原型：纯前端展示页面，用于评审页面结构、字段、交互和备注
+2. demo：可以直接运行的可操作实例，用于体验真实流程和状态变化
+```
+
+用户选择原型后写入 `delivery_type=prototype` 并读取 `rules/prototype_workflow.md`；用户选择 demo 后写入 `delivery_type=demo` 并读取 `rules/demo_workflow.md`。若用户先选择 demo，不再反向生成原型。
 
 无状态文件但只发现文档时：询问"文档是否已定稿？"
-- 已定稿 → 设 `doc_finalized=true`，告知可继续生成原型
+- 已定稿 → 设 `doc_finalized=true, last_checkpoint=delivery_choice`，询问输出原型还是 demo
 - 未定稿 → 设 `last_checkpoint=phase2_review_done`，展示文档内容，走步骤 8

@@ -5,8 +5,10 @@
 - 每个阶段结束后必须等用户明确确认
 - 文档生成后必须启动独立 subagent review
 - 原型生成后必须启动独立 subagent review
+- demo 生成后必须完成可运行性验证
+- demo 独立任务应并行分发给多个 Sub-Agent
 - 每次到达 checkpoint 后立即更新 .pm_state.json
-- 修改文档或原型后必须询问是否同步另一方
+- 修改文档、原型或 demo 后必须读取 sync_workflow.md 确认同步范围
 
 ## 项目背景
 - {最多3条，一句话描述项目是什么}
