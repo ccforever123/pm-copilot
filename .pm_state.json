@@ -1,0 +1,40 @@
+{
+  "phase": 1,
+  "active_workflow": "requirements",
+  "doc_file": null,
+  "doc_finalized": false,
+  "delivery_type": null,
+  "prototype_folder": null,
+  "prototype_version": null,
+  "prototype_finalized": false,
+  "demo_folder": null,
+  "demo_finalized": false,
+  "demo_version": null,
+  "demo_tech_stack": null,
+  "demo_run_command": null,
+  "last_checkpoint": "phase1_in_progress",
+  "last_doc_review_result": null,
+  "last_prototype_review_result": null,
+  "last_demo_validation_result": null,
+  "last_sync_result": null,
+  "last_sync_scope": null,
+  "loaded_memory_layers": [],
+  "resume_required_files": [
+    "CLAUDE.md",
+    "memory/harness_memory.md",
+    "memory/project_memory.md",
+    ".pm_state.json"
+  ],
+  "feature_list": null,
+  "prototype_pages": {
+    "confirmed_list": [],
+    "completed": [],
+    "failed": []
+  },
+  "demo_tasks": {
+    "confirmed_list": [],
+    "running": [],
+    "completed": [],
+    "failed": []
+  }
+}
