@@ -1,272 +1,183 @@
-# 产品经理文档工作流 V1.2 更新日志
+# 产品需求 Harness 工作流 V1.3
 
 来源：微信公众号：松鼠的AI笔记。
 
-V1.2 基于 V1.1 继续演进，核心目标是在需求文档定稿后增加 vibe coding / demo 生成路径：用户可以选择输出纯前端展示原型，也可以选择输出可以直接运行的可操作 demo；若先输出原型，原型定稿后还可以继续输出 demo。
+V1.3 基于 V1.2 演进为 Harness 约束版本。核心目标是降低长会话压缩、上下文丢失和多交付物切换导致的失忆风险，把运行状态、项目决策和固定工作流规则拆成三层记忆库。
 
-## 继承自 V1.1 的能力
+## V1.3 核心变化
 
-V1.2 保留了 V1.1 的主流程：
+- `CLAUDE.md` 变成 Harness 入口，只负责启动、恢复、状态路由和记忆读写协议。
+- 记忆拆成三层：L1 运行状态、L2 项目决策、L3 工作流规则。
+- 具体流程继续按需读取 `rules/`，避免主上下文膨胀。
+- 压缩恢复协议独立放在 `memory/compaction_resume.md`。
+- V1.2 的原型 / demo / sync 工作流完整保留。
+- **新增**：强制身份锁定、退出/重新进入机制、自检清单、规则加载白名单。
 
-- 阶段一：需求拆解，先澄清目标、用户、功能、边界和非功能需求。
-- 阶段二：生成需求文档，并通过 subagent review 检查完整性、清晰度、可行性和一致性。
-- 阶段三：根据用户选择生成 HTML 页面原型或可运行 demo；原型定稿后可继续生成 demo。
-- 阶段四：文档、原型或 demo 变更后，询问是否同步其他交付物。
-
-V1.2 继续沿用 V1.1 的两个 HTML 模板：
+## 三层记忆库
 
 ```text
-templates/
-├── 需求说明文档模板.html
-└── 原型备注模板.html
+L1 .pm_state.json
+  记录运行现场：phase、active_workflow、last_checkpoint、交付物路径、版本号、任务状态、review/验证结果。
+
+L2 memory/project_memory.md
+  记录项目决策：项目背景、已确认决策、已否决方案、待确认问题、用户偏好。
+
+L3 memory/harness_memory.md
+  记录固定约束：行为规则、记忆分层、启动顺序、读写原则。
 ```
 
-其中，`需求说明文档模板.html` 仍然支持双击正文进入编辑状态，保存时覆盖原文件即可更新文档。
+读取顺序固定为：
 
-## 整体工作流程图
+```text
+CLAUDE.md → memory/harness_memory.md → memory/project_memory.md → .pm_state.json
+```
+
+## Harness 工作流程图
 
 ```mermaid
 flowchart TD
-    A["启动工作流"] --> B["静默读取 MEMORY.md"]
-    B --> C{"是否存在 .pm_state.json"}
-    C -- "存在" --> D["读取 last_checkpoint 并恢复"]
-    C -- "不存在" --> E{"是否已有需求文档"}
-    E -- "有" --> F["推断状态并确认文档是否定稿"]
-    E -- "无" --> G["进入全新需求流程"]
+    A["启动 Harness"] --> B["读取 CLAUDE.md"]
+    B --> C["读取 L3 harness_memory.md"]
+    C --> D["静默读取 L2 project_memory.md"]
+    D --> E{"是否存在 L1 .pm_state.json"}
+    E -- "存在" --> F["解析 active_workflow 和 last_checkpoint"]
+    E -- "不存在" --> G{"是否已有需求文档"}
+    G -- "无" --> H["全新需求流程"]
+    G -- "有" --> I["推断状态并询问文档是否定稿"]
 
-    D --> H["阶段一：需求拆解"]
-    F --> H
-    G --> H
+    F --> J{"路由到工作流"}
+    H --> K["requirements_workflow.md"]
+    I --> K
+    J -- "requirements" --> K
+    J -- "prototype" --> L["prototype_workflow.md"]
+    J -- "demo" --> M["demo_workflow.md"]
+    J -- "sync" --> N["sync_workflow.md"]
 
-    H --> I{"需求是否清晰完整"}
-    I -- "否" --> J["追问模糊、缺失、矛盾和风险点"]
-    J --> H
-    I -- "是" --> K["输出功能拆解并等待确认"]
-    K --> L{"用户确认"}
-    L -- "否" --> H
-    L -- "是" --> M["阶段二：生成需求文档"]
+    K --> O["需求拆解 + 文档生成 + 文档 review"]
+    O --> P{"文档是否定稿"}
+    P -- "否" --> O
+    P -- "是" --> Q{"选择原型或 demo"}
 
-    M --> N["运行文档 review"]
-    N --> O{"是否存在阻断或重要问题"}
-    O -- "是" --> P["修正文档并更新 MEMORY.md"]
-    P --> N
-    O -- "否" --> Q["等待用户确认文档定稿"]
+    Q -- "原型" --> L
+    L --> R["并行生成 HTML 原型 + review"]
+    R --> S{"原型是否定稿"}
+    S -- "否" --> R
+    S -- "是" --> T{"是否继续生成 demo"}
+    T -- "是" --> M
+    T -- "否" --> U["进入变更同步待命"]
 
-    Q --> R{"选择下一步交付物"}
-    R -- "原型" --> S["加载 prototype_workflow.md"]
-    S --> T["确认页面清单"]
-    T --> U["并行生成 HTML 原型"]
-    U --> V["运行原型 review"]
-    V --> W{"原型是否通过"}
-    W -- "否" --> X["修复原型并重新 review"]
-    X --> V
-    W -- "是" --> Y["用户确认原型定稿"]
+    Q -- "demo" --> M
+    M --> V["确认技术栈 + 检查同版本原型"]
+    V --> W["并行生成 demo 任务"]
+    W --> X["lint/build/test/浏览器验证"]
+    X --> Y{"demo 是否定稿"}
+    Y -- "否" --> W
+    Y -- "是" --> U
 
-    R -- "demo" --> Z["加载 demo_workflow.md"]
-    Z --> AA["确认 demo 技术方案和版本目录"]
-    AA --> AB["创建 demo/{版本号}/"]
-    AB --> AC["拆解 task.json 并行分发 Sub-Agent"]
-    AC --> AD["运行 lint/build/test/浏览器验证"]
-    AD --> AE{"demo 是否通过验证"}
-    AE -- "否" --> AF["修复 demo 并重新验证"]
-    AF --> AD
-    AE -- "是" --> AG["用户确认 demo 定稿"]
-
-    Y --> AL{"是否继续生成 demo"}
-    AL -- "是" --> Z
-    AL -- "否" --> AH["阶段四：变更同步"]
-    AG --> AH
-    AH --> AI{"文档 / 原型 / demo 是否变更"}
-    AI -- "是" --> AJ["加载 sync_workflow.md 确认同步范围"]
-    AJ --> AH
-    AI -- "否" --> AK["交付完成"]
+    U --> Z{"任一交付物变更"}
+    Z -- "是" --> N
+    N --> AA["确认同步范围并按需更新"]
+    AA --> U
+    Z -- "否" --> AB["交付完成"]
 ```
 
-## V1.2 主要更新
+## 工作流说明
 
-### 1. 增加原型 / demo 输出选择
+### 1. Requirements 工作流
 
-需求文档定稿后，V1.2 不再默认进入原型生成，而是先询问用户选择交付物：
+文件：`rules/requirements_workflow.md`
 
-- 原型：纯前端展示页面，继续读取 `rules/prototype_workflow.md`。
-- demo：可以直接运行的可操作实例，读取 `rules/demo_workflow.md`。
+- 澄清需求。
+- 主动挑战模糊、矛盾、缺失、范围过大和技术风险。
+- 生成需求文档。
+- 运行文档 review。
+- 文档定稿后询问输出原型还是 demo。
 
-初始选择只能二选一。若用户选择原型，原型定稿后会再次询问是否继续生成 demo；若用户选择 demo，则不再反向生成原型。选择结果写入 `.pm_state.json` 的 `delivery_type` 字段，便于中断恢复和后续变更同步。
+### 2. Prototype 工作流
 
-### 2. Demo 工作流独立化
+文件：`rules/prototype_workflow.md`
 
-V1.2 新增 `rules/demo_workflow.md`，将可运行 demo 的方案确认、任务拆解、生成、验证和定稿规则独立维护。
+- 基于需求文档确认页面列表。
+- 原型统一写入 `prototype/{版本号}/`，不同版本互相隔离。
+- 多个页面可并行分发给 Sub-Agent。
+- 运行原型 review。
+- 原型定稿后询问是否继续生成 demo。
 
-demo 流程参考 auto coding agent 的六步模式，但改造成适合产品需求文档的交付流程：
+### 3. Demo 工作流
 
-- 确认 demo 运行方式、技术栈和可操作流程。
-- 用户无特殊要求时，由 AI 推荐最契合当前需求的技术栈，默认优先考虑 `Node.js` + `SQLite`；涉及 AI、模型调用或 Python 生态更合适时，可建议使用 `Python`。
-- 用户有特殊技术要求时，AI 需要对比“AI 建议方案”和“用户指定方案”的优缺点，并在用户明确确认最终方案后再执行。
-- 生成 demo 前检查是否存在同版本原型；若存在，经确认后结合需求文档和原型生成，需求文档负责功能规则，原型负责 UI、布局和交互参考；若不存在，则仅按需求文档生成 demo。
-- 创建版本隔离的 demo 目录。
-- 用 `task.json` 拆解可并行任务。
-- 多个独立 Sub-Agent 同时生成 demo，不在单任务完成后中断等待用户确认。
-- 所有任务完成后统一更新 `progress.txt` 并进入验证。
-- 运行 lint/build/test 或必要的浏览器验证。
-- 验证通过后等待用户确认定稿。
+文件：`rules/demo_workflow.md`
 
-### 3. 统一变更同步流程
+- 生成前先确认技术栈。
+- 无特殊要求时优先建议 `Node.js + SQLite`，涉及 AI 或 Python 生态更合适时可建议 `Python`。
+- 生成前检查同版本原型；若有，经确认后结合需求文档和原型生成；若无，仅按需求文档生成。
+- demo 文件写入 `demo/{版本号}/`，不同版本数据隔离。
+- demo 任务按 `task.json` 拆解后并行分发给多个 Sub-Agent。
+- 所有任务完成后统一运行 lint/build/test/浏览器验证。
 
-V1.2 新增 `rules/sync_workflow.md`，集中处理文档、原型和 demo 的一致性维护。
+### 4. Sync 工作流
 
-任一交付物变更后，先展示变更来源、影响范围和建议同步目标，再由用户确认同步范围：
+文件：`rules/sync_workflow.md`
 
-- `delivery_type=prototype`：维护文档与原型一致性。
-- `delivery_type=demo`：维护文档与 demo 一致性。
-- `delivery_type=prototype_then_demo`：维护文档、原型、demo 三方一致性。
+- 任一交付物修改后进入 `change_sync`。
+- 根据 `delivery_type` 判断同步范围：
+  - `prototype`：文档 ↔ 原型
+  - `demo`：文档 ↔ demo
+  - `prototype_then_demo`：文档 ↔ 原型 ↔ demo
+- 用户确认同步范围后再修改其他交付物。
 
-同步时按需读取 `requirements_workflow.md`、`prototype_workflow.md` 或 `demo_workflow.md`，同步完成后重新运行对应 review 或验证。
-
-### 4. Demo 版本目录隔离
-
-demo 实例统一创建在根目录 `demo/` 下，并按需求文档版本号命名子文件夹：
-
-```text
-demo/
-└── v1.0/
-    ├── README.md
-    ├── task.json
-    ├── progress.txt
-    └── ...
-```
-
-不同版本 demo 不得共用 mock 数据、运行数据、缓存文件或上传文件，避免版本间互相污染。
-
-### 5. 规则与流程文件集中管理
-
-V1.2 延续 V1.1 的目录原则：阶段规则、review 提示词、Sub-Agent 分发规范、任务状态文件和 demo 工作流统一放到根目录 `rules/` 下：
+## V1.3 文件结构
 
 ```text
-rules/
-├── requirements_workflow.md
-├── prototype_workflow.md
-├── demo_workflow.md
-├── sync_workflow.md
-├── review_doc.md
-├── review_prototype.md
-├── subagent_dispatch.md
-└── task-state.md
-```
-
-`CLAUDE.md` 只保留启动序列、状态结构、阶段路由和恢复规则。具体规则与流程文件在需要时再读取，减少主上下文负担，也方便集中查阅和维护。
-
-### 6. Review 提示词独立化
-
-V1.2 延续文档 review 和原型 review 提示词独立维护的方式：
-
-```text
-rules/
-├── review_doc.md
-└── review_prototype.md
-```
-
-这样可以单独维护 review 标准，也方便后续增强审查维度。
-
-### 7. 模板目录保持纯净
-
-`templates/` 目录只保留可复用的模板文件：
-
-```text
-templates/
-├── 需求说明文档模板.html
-└── 原型备注模板.html
-```
-
-规则、流程、review、状态类文件不再放入 `templates/`，避免模板资产与运行约束混在一起。
-
-### 8. Sub-Agent 分发规范
-
-V1.2 继续使用 `rules/subagent_dispatch.md`，规定每个原型页面任务和 demo 实现任务都必须包含任务标题、执行范围、验收标准和上下文四要素。
-
-这让页面原型和 demo 实现都更适合分发给多个 subagent，并降低不同任务互相误改的风险。
-
-### 9. 并行原型生成
-
-V1.2 保留并行生成 HTML 原型能力。只有在页面内容独立、不写同一文件、范围清晰时才允许并行。
-
-并行生成后会记录：
-
-- `prototype_pages.confirmed_list`：已确认页面列表。
-- `prototype_pages.completed`：已完成页面。
-- `prototype_pages.failed`：生成失败页面。
-- `rules/task-state.md`：subagent 页面任务状态。
-
-失败任务最多重试 3 次，超过后上报用户决策。
-
-### 10. MEMORY.md 跨会话记忆
-
-V1.2 继续使用 `MEMORY.md`，用于记录 `.pm_state.json` 不适合保存的项目内容记忆。
-
-`.pm_state.json` 记录执行状态：
-
-- 当前阶段。
-- 文档路径。
-- 原型路径。
-- demo 路径、版本、技术栈和运行命令。
-- checkpoint。
-- review 结果。
-
-`MEMORY.md` 记录项目记忆：
-
-- 项目背景。
-- 已确认决策。
-- 已否决方案。
-- 待确认问题。
-- 用户偏好。
-- 关键行为规则快照。
-
-启动时会静默读取 `MEMORY.md`。文件不存在时跳过，不向用户报错。
-
-### 11. Compaction Instructions 压缩保护
-
-V1.2 继续保留 `Compaction Instructions`，用于保护长会话压缩后的恢复能力。
-
-当对话被压缩时，摘要末尾必须保留恢复指令，要求继续任务前按顺序重读：
-
-```text
-CLAUDE.md
-MEMORY.md
-.pm_state.json
-```
-
-这相当于在 compact 后执行一次轻量恢复：从 `CLAUDE.md` 恢复规则，从 `MEMORY.md` 恢复项目记忆，从 `.pm_state.json` 恢复执行现场。
-
-## V1.2 文件结构
-
-```text
-V1.2/
-├── CLAUDE.md
-├── MEMORY.md
-├── README.md
+V1.3/
+├── CLAUDE.md                        ← Harness 入口，含强制身份锁定、退出机制、自检清单
+├── README.md                        ← 本文档
+├── memory/
+│   ├── harness_memory.md            ← L3：行为规则（含违规自检）、读取/写入原则
+│   ├── project_memory.md            ← L2：项目决策（模板，首次使用需填写）
+│   └── compaction_resume.md         ← 压缩恢复协议（中英双语）
 ├── rules/
-│   ├── requirements_workflow.md
-│   ├── prototype_workflow.md
-│   ├── demo_workflow.md
-│   ├── sync_workflow.md
-│   ├── review_doc.md
-│   ├── review_prototype.md
-│   ├── subagent_dispatch.md
-│   └── task-state.md
+│   ├── requirements_workflow.md     ← 需求拆解+文档生成（含确认定义、自检清单）
+│   ├── prototype_workflow.md        ← 原型生成（含版本号阻断、自检清单）
+│   ├── demo_workflow.md             ← demo 生成（含强行推进定义、自检清单）
+│   ├── sync_workflow.md             ← 变更同步（含自动同步定义、自检清单）
+│   ├── review_doc.md                ← 文档 review 提示词（含格式强制）
+│   ├── review_prototype.md          ← 原型 review 提示词（含格式强制）
+│   ├── subagent_dispatch.md         ← Sub-Agent 分发规范
+│   └── task-state.md                ← 任务状态记录
 ├── templates/
 │   ├── 需求说明文档模板.html
 │   └── 原型备注模板.html
+├── prototype/
+│   └── .gitkeep
 └── demo/
-    └── v1.0/
+    └── .gitkeep
 ```
+
+## 新增机制
+
+### 强制身份锁定
+AI 的唯一身份是"产品需求交付 Harness"。如果用户要求执行与 Harness 无关的任务，必须拒绝并引导用户说"退出 Harness"。
+
+### 退出与重新进入
+- **退出**：用户说"退出 Harness" → 确认后恢复为通用助手
+- **重新进入**：用户说"启动 Harness" → 重新执行完整启动序列，从 `.pm_state.json` 恢复或全新开始
+
+### 自检清单
+每个关键文件（CLAUDE.md、所有 workflow 文件）都包含自检清单，AI 每次回复前必须检查：
+- 是否到达 checkpoint？→ `.pm_state.json` 是否已更新？
+- 是否违反行为规则？→ 若违反，是否已纠正并报告？
+- 是否需要用户确认？→ 是否已等待明确确认（"确认""定稿""没问题"）？
+
+### 规则加载白名单
+根据 `active_workflow` 严格限制可读取的规则文件，禁止以"预习""参考"为由提前加载其他 workflow。
 
 ## 升级价值
 
-相比 V1.1，V1.2 的重点是把“需求文档 → 可运行 demo”的路径纳入同一套可恢复工作流：
-
-- 文档定稿后先明确选择原型或 demo，原型定稿后可继续输出 demo，交付路径更清楚。
-- demo 工作流独立维护，避免主文件膨胀。
-- demo 支持多个 Sub-Agent 并行生成，减少长流程等待。
-- sync 工作流统一维护三方一致性，减少规则分散造成的歧义。
-- demo 按版本目录隔离，历史版本可运行数据不被覆盖。
-- `task.json` 与 `progress.txt` 让 demo 实现过程可追踪、可恢复。
-- 验证规则要求 demo 真正可运行，而不是只生成代码文件。
+- 压缩后恢复路径固定，不依赖模型记忆前文。
+- 运行状态、项目决策和工作流规则互不污染。
+- `CLAUDE.md` 更轻，长期维护更稳定。
+- workflow 继续按需加载，降低上下文占用。
+- 无状态时会扫描需求文档、`prototype/*/` 和 `demo/*/`，辅助恢复已有交付物。
+- 原型、demo、同步流程都能从 checkpoint 恢复。
+- **强制身份和自检机制降低 AI 偏离风险**。
+- **退出/进入机制支持灵活切换 Harness 和通用助手模式**。
