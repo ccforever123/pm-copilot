@@ -1,9 +1,8 @@
-# 同步工作流：文档 / 原型 / demo 一致性维护
+# V1.7 同步与 out_files 归档工作流
 
-> 本文件在以下情况下由 Harness 用 Read 工具加载：需求文档、HTML 原型或可运行 demo 任一交付物被修改；恢复 `change_sync` 检查点；用户要求同步多个交付物。
-> 需要记忆层：L1 `.pm_state.json`、L2 `memory/project_memory.md`、L3 `memory/harness_memory.md`。
+> 本文件在用户提出已定稿交付物变更、documents 信息冲突、或需要集中导出交付物时加载。V1.7 要求先读相关 `_index.md` 判断影响范围，用户确认后只读取受影响源文件。
 
----
+涉及用户确认、流程分支选择、下一步交付物选择或同步范围确认时，如果当前运行环境支持交互式选项、选择框或确认控件，必须优先使用交互式选项；不支持时，退回文本确认。
 
 ## 触发条件
 
@@ -12,129 +11,118 @@
 ```json
 {
   "active_workflow": "sync",
-  "last_checkpoint": "change_sync"
+  "last_checkpoint": "change_sync",
+  "current_node": "sync.confirm_scope",
+  "process_file": "memory/process/sync.confirm_scope.md"
 }
 ```
 
 然后读取本文件，展示变更来源、影响范围和可同步目标，不得默认自动同步。
 
-"默认自动同步"的禁止行为：
-- 未经用户确认就修改其他交付物
-- 假设用户"肯定想同步"而直接执行
-- 只展示同步计划但不等确认就执行
+## 默认自动同步禁止项
 
-正确行为：必须输出【变更同步确认】格式，等用户明确回复确认范围后才能执行。
+- 未经用户确认就修改其他交付物。
+- 假设用户“肯定想同步”而直接执行。
+- 只展示同步计划但不等确认就执行。
+- 为了判断影响范围而一次性读取全部 documents、原型或 demo 源文件。
+- 发现 documents 冲突后默默选择其中一方。
 
----
+## 影响范围判断
 
-## 同步范围确认
+先读取索引：
 
-先识别当前存在的交付物：
+- 文档：`documents/_index.md`
+- 原型：`prototype/_index.md`
+- Demo：`demo/_index.md`
 
-- 需求文档：`doc_file`
-- 页面原型：`prototype_folder`
-- 可运行 demo：`demo_folder`
+然后根据变更来源判断可能影响：
 
-根据 `delivery_type` 判断交付关系：
+| 变更来源 | 可能需要同步 |
+|---|---|
+| PRD | supporting documents、原型、demo、out_files |
+| Supporting document | PRD、其他 supporting documents、out_files |
+| 原型 | PRD、demo、out_files |
+| Demo | PRD、原型、out_files |
+| out_files | 仅作为导出结果，不反向作为源，除非用户明确要求 |
 
-- `prototype`：只维护文档与原型一致性。
-- `demo`：只维护文档与 demo 一致性。
-- `prototype_then_demo`：维护文档、原型、demo 三方一致性。
+若索引不足以判断，再只读取受影响候选文件，不读取无关目录。
 
-输出并等待用户确认：
+## Documents 冲突处理
+
+如果多个 documents 对同一事实、规则、指标、用户定义、流程或边界描述不一致，必须输出：
+
+```text
+【文档冲突】
+
+冲突点：{主题}
+- 来源 A：documents/{文件A}.md，内容：{摘要}
+- 来源 B：documents/{文件B}.md，内容：{摘要}
+
+请选择处理方式：
+1. 修改来源 A
+2. 修改来源 B
+3. 同步两份文档
+4. 保留差异，并在 PRD 中说明适用边界
+```
+
+用户确认前，不得把冲突信息写入新 PRD 或 demo 逻辑。
+
+## 同步确认格式
 
 ```text
 【变更同步确认】
 
-变更来源：{需求文档 / 页面原型 / demo}
-变更摘要：
-- {变更1}
-- {变更2}
+变更来源：{documents / 原型 / demo}
+变更内容：{简述}
 
-建议同步范围：
-- 需求文档：{需要 / 不需要，原因}
-- 页面原型：{需要 / 不需要 / 不存在，原因}
-- demo：{需要 / 不需要 / 不存在，原因}
+可能影响：
+1. {交付物A}：{影响原因}
+2. {交付物B}：{影响原因}
 
-版本号建议：{保持当前版本 / 次版本 +1 / 主版本 +1}
-待确认问题：（无则删除此行）
+请选择同步范围：
+- 仅保留当前变更
+- 同步到 documents
+- 同步到原型
+- 同步到 demo
+- 同步到 out_files
+- 同步全部受影响交付物
 ```
 
-用户明确确认同步范围后才能修改其他交付物。
+## 执行规则
 
----
+- 用户确认同步 documents：读取 `rules/requirements_workflow.md` 或 `rules/template_routing.md`，只修改受影响章节，并重新运行文档 review。
+- 用户确认同步原型：读取 `rules/prototype_workflow.md`，只修复受影响页面，并重新运行原型 review。
+- 用户确认同步 demo：读取 `rules/demo_workflow.md`，只修复受影响任务、页面、接口或数据，并重新执行 demo 验证。
+- 用户确认同步 out_files：将已定稿或验证通过的文件复制到 `out_files/documents/`、`out_files/prototype/`、`out_files/demo/`。
+- 用户选择仅保留当前变更：记录到 `memory/project_memory.md` 的已确认决策或已否决方案。
 
-## 同步执行规则
+## out_files 归档规则
 
-### 文档被修改
+`out_files/` 是用户交付出口，不是编辑源：
 
-- 若存在原型且用户确认同步原型：读取 `rules/prototype_workflow.md`，只修复受影响页面，并重新运行原型 review。
-- 若存在 demo 且用户确认同步 demo：读取 `rules/demo_workflow.md`，只修复受影响任务、页面、接口或数据，并重新执行 demo 验证。
+- PRD 和其他文档定稿后，同步到 `out_files/documents/`。
+- 原型定稿后，同步版本目录到 `out_files/prototype/{版本}/`。
+- demo 验证通过后，同步版本目录到 `out_files/demo/{版本}/`。
+- 同步后更新 `.pm_state.json.out_files` 和相关索引。
+- 不得从 `out_files/` 反向覆盖工作目录，除非用户明确要求。
 
-### 原型被修改
+## 完成后写入
 
-- 若用户确认同步文档：读取 `rules/requirements_workflow.md`，修改受影响章节，并重新运行文档 review。
-- 若存在 demo 且用户确认同步 demo：读取 `rules/demo_workflow.md`，修改受影响任务、页面、接口或数据，并重新执行 demo 验证。
+1. 将同步结果写入 `.pm_state.json.last_sync_result`。
+2. 更新 `.pm_state.json.last_sync_scope`。
+3. 清理已解决的 `memory/project_memory.md` 待确认问题。
+4. 将用户确认的同步策略写入 `memory/project_memory.md`。
+5. 更新当前 `memory/process/*.md`。
+6. 更新 `memory/handoff.md`。
+7. 更新受影响的 `_index.md`。
+8. 若涉及交付出口，更新 `.pm_state.json.out_files`。
 
-### demo 被修改
+## 自检清单
 
-- 若用户确认同步文档：读取 `rules/requirements_workflow.md`，修改受影响章节，并重新运行文档 review。
-- 若存在原型且用户确认同步原型：读取 `rules/prototype_workflow.md`，只修复受影响页面，并重新运行原型 review。
-
----
-
-## 版本号规则
-
-- 大改：模块增删、核心流程重构、权限模型变化、数据模型变化 → 主版本 +1。
-- 小改：字段、文案、交互细节、示例数据、局部规则调整 → 次版本 +1。
-- 仅修复错别字、展示瑕疵、无语义变化的问题 → 可保持当前版本。
-
-版本变化时必须同步更新：
-
-- 需求文档文件名
-- 原型子目录名
-- demo 子目录名
-- `.pm_state.json` 中的 `doc_file`、`prototype_folder`、`demo_folder`
-
-demo 新版本必须创建新的 `demo/{版本号}/` 子目录，不得覆盖旧版本 demo 的运行数据、mock 数据、数据库文件、缓存文件或上传文件。
-
-原型新版本必须创建新的 `prototype/{版本号}/` 子目录，不得覆盖旧版本原型文件。
-
----
-
-## 状态与记忆更新
-
-同步完成后：
-
-1. 将同步结果写入 `.pm_state.json` 的 `last_sync_result`。
-2. 清理已解决的 `memory/project_memory.md` 待确认问题。
-3. 将用户确认的同步策略写入 `memory/project_memory.md` 已确认决策。
-4. 若用户否决同步，将否决项和原因写入 `memory/project_memory.md` 已否决方案。
-
----
-
-## 自检清单（本工作流每次回复前执行）
-
-□ 是否已识别变更来源？→ 哪个交付物被修改？
-□ 是否已判断同步范围？→ 根据 delivery_type 确定需要同步的交付物
-□ 是否已输出【变更同步确认】？→ 是否等用户明确确认范围？
-□ 用户确认的定义：用户明确说"确认同步""同意""按此范围执行"等肯定性词汇
-□ 是否到达 checkpoint？→ `.pm_state.json` 是否已更新？
-□ 版本号是否需要变更？→ 是否已按版本号规则处理？
-
----
-
-输出：
-
-```text
-✅ 变更同步已完成
-
-已同步：
-- {交付物1}
-- {交付物2}
-
-未同步：
-- {交付物，原因}
-
-验证结果：{文档 review / 原型 review / demo 验证摘要}
-```
+□ 是否先读索引，而不是直接读全部源文件？
+□ 是否等待用户确认同步范围？
+□ 是否只读取和修改受影响文件？
+□ documents 冲突是否已展示来源并等待用户选择？
+□ 是否重新执行必要 review 或验证？
+□ 是否更新 `.pm_state.json`、process、handoff 和索引？
+□ 定稿或验证通过后是否同步到 `out_files/`？

@@ -1,7 +1,7 @@
 # Demo 工作流：需求文档 → 可运行实例
 
 > 本文件在以下情况下由 Harness 用 Read 工具加载：阶段二文档定稿后用户选择输出 demo、原型定稿后用户继续选择输出 demo、恢复 demo 相关检查点、变更同步确认需要更新 demo。
-> 需要记忆层：L1 `.pm_state.json`、L2 `memory/project_memory.md`、L3 `memory/harness_memory.md`。
+> V1.6 读取规则：先读 `demo/_index.md`，需要实现、验证或修复时才读取相关 demo 源文件。过程记录写入当前 `memory/process/*.md`，不要用 `progress.txt` 承担跨会话恢复。
 
 ---
 
@@ -23,7 +23,7 @@ demo/
 └── v1.0/
     ├── README.md
     ├── task.json
-    ├── progress.txt
+    ├── task.json
     └── ...
 ```
 
@@ -35,7 +35,7 @@ demo/
 
 ## Demo 步骤一：方案确认
 
-写入状态：`delivery_type={demo 或 prototype_then_demo}, active_workflow=demo, phase=3, demo_folder=demo/{版本号}, demo_version={版本号}, last_checkpoint=demo_planning`
+写入状态：`delivery_type={demo 或 prototype_then_demo}, active_workflow=demo, phase=3, demo_folder=demo/{版本号}, demo_version={版本号}, last_checkpoint=demo_planning, current_node=demo.plan_stack, process_file=memory/process/demo.plan_stack.md`
 
 ### 同版本原型检查
 
@@ -110,8 +110,8 @@ demo/
 2. 在子文件夹中创建或更新：
    - `README.md`：运行方式、功能说明、验证方式。
    - `task.json`：按可独立完成、可并行执行的任务拆解，字段包含 `id`、`title`、`description`、`scope`、`dependencies`、`passes`。
-   - `progress.txt`：记录任务进度、问题和验证结果。
-3. 写入状态：`last_checkpoint=demo_generating`。
+   - 当前 `memory/process/*.md`：记录任务进度、问题和验证结果。
+3. 写入状态：`last_checkpoint=demo_generating, current_node=demo.generate, process_file=memory/process/demo.generate.md`。
 4. 用 Read 工具读取 `rules/subagent_dispatch.md` 获取 demo 任务分发格式。
 5. 将 `task.json` 中 `passes=false` 且依赖已满足的任务分发给多个独立 Sub-Agent 并行执行；每个 Sub-Agent 只负责自己的文件范围和验收标准。
 6. 并行前提（全部满足才并行）：任务文件范围不重叠、依赖关系清晰、不写同一数据文件或配置文件；不满足时先拆分任务或串行处理依赖任务。
@@ -129,26 +129,26 @@ demo/
    - 所有示例数据、mock 数据和本地持久化文件都必须保存在 `demo/{版本号}/` 内。
 9. 每个任务完成后更新：
    - `task.json`：对应任务 `passes=true`
-   - `progress.txt`：记录任务 ID、标题、实现内容、验证结果和时间戳
+   - 当前 `memory/process/*.md`：记录任务 ID、标题、实现内容、验证结果和时间戳
    - `.pm_state.json`：更新 `demo_tasks.running`、`demo_tasks.completed` 或 `demo_tasks.failed`
 10. 所有任务 `passes=true` 后，才能进入 Demo 验证；不得因为单个任务完成就等待用户确认或提前定稿。
 
 如遇缺少环境配置、外部依赖不可用、需求决策不明确等阻塞问题，不得强行推进。
 
 "强行推进"的判定标准（满足任一即算强行推进）：
-- 缺少环境配置但未记录到 progress.txt 就继续
+- 缺少环境配置但未记录到当前 `memory/process/*.md` 就继续
 - 外部依赖不可用但未上报用户就继续
 - 需求决策不明确但未写入 project_memory.md 待确认问题就继续
 - 测试失败但未修复就标记为完成
 - 用户未确认方案就开始实现
 
-正确做法：记录到 `progress.txt`，写入 `memory/project_memory.md` 待确认问题，并等待用户处理。
+正确做法：记录到当前 `memory/process/*.md`，写入 `memory/project_memory.md` 待确认问题，并等待用户处理。
 
 ---
 
 ## Demo 步骤三：验证
 
-写入状态：`last_checkpoint=demo_testing`
+写入状态：`last_checkpoint=demo_testing, current_node=demo.test, process_file=memory/process/demo.test.md`
 
 根据 demo 技术栈执行验证：
 
@@ -157,7 +157,7 @@ demo/
 - 如无构建工具，至少执行可运行性检查，并说明验证方式。
 - 测试失败时必须修复后重新验证，不得将失败 demo 标记为完成。
 
-验证通过后，写入 `last_demo_validation_result`，更新 `last_checkpoint=demo_review_done`，展示验证结果并等待用户确认定稿。
+验证通过后，写入 `last_demo_validation_result`，更新 `last_checkpoint=demo_review_done, current_node=demo.finalize`，展示验证结果并等待用户确认定稿。
 
 ---
 
@@ -196,7 +196,8 @@ Demo 目录：demo/{版本号}/
 □ 是否已检查同版本原型？→ `prototype_folder` 是否已确认？
 □ 版本号是否已确认？→ 是否已询问用户且获得明确回复？
 □ 是否到达 checkpoint？→ `.pm_state.json` 是否已更新？
-□ 是否有阻塞问题？→ 是否已记录到 progress.txt 和 project_memory.md？
+□ 是否有阻塞问题？→ 是否已记录到当前 `memory/process/*.md` 和 project_memory.md？
+□ 是否更新了 `memory/handoff.md` 和 `demo/_index.md`？
 □ 验证是否通过？→ lint/build/test 是否全部通过？
 □ 是否需要用户确认定稿？→ 是否已等待明确确认？
 

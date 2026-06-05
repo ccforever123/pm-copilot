@@ -1,74 +1,46 @@
-# Harness Memory
+# Harness Memory V1.7
 
-> L3 工作流规则记忆。记录跨项目稳定生效的 Harness 行为约束。
+## 固定行为约束
 
-## 行为规则（违反任何一条必须立即纠正）
+- 启动只读 `rules/startup.md`、`rules/guardrails.md`、`.pm_state.json`、`memory/handoff.md`。
+- 禁止为了预习而读取全部 rules、全部 templates、全部 experts 或全部交付物。
+- 需求入口必须先判断清晰度；不清晰时提供澄清、头脑风暴或前期分析工具选项。
+- PRD 是默认主线；其他文档只在用户要求或用户选择前期工具时生成。
+- PRD 必须覆盖目的背景、目标指标、用户场景、流程架构、功能边界、业务规则、非功能、上线计划、依赖风险和验收自检。
+- 原型批注只放页面可见内容；PRD 承载业务逻辑、计算规则、状态机、外部对接、权限和数据生命周期。
+- documents 中的信息复用前，必须展示信息和来源并等待用户确认。
+- documents 冲突必须显式提出，不得默默选择。
+- 多专家只作为按需评审 Agent 加载，不常驻上下文。
+- 定稿或验证通过后，交付物同步到 `out_files/`。
 
-□ 1. 需求模糊或信息缺失时 → 必须停止当前工作，直接追问用户
-   违规表现：继续生成文档/原型/demo 而没有先澄清问题
-   纠正动作：立即停止，向用户道歉并列出需要澄清的问题
+## 读取原则
 
-□ 2. 每个阶段结束后 → 必须等待用户明确说"确认""定稿""没问题"才能继续
-   违规表现：用户只说"好的""知道了"就自动进入下一阶段
-   纠正动作：回退到等待确认状态，重新请求明确确认
+启动顺序：
 
-□ 3. 文档生成后 → 必须启动独立 Sub-Agent 进行 review
-   违规表现：自己 review 或直接标记为完成
-   纠正动作：立即停止，启动 Sub-Agent review
+1. `rules/startup.md`
+2. `rules/guardrails.md`
+3. `.pm_state.json`
+4. `memory/handoff.md`
 
-□ 4. 原型生成后 → 必须启动独立 Sub-Agent 进行 review
-   违规表现：自己 review 或直接标记为完成
-   纠正动作：立即停止，启动 Sub-Agent review
-
-□ 5. demo 生成前 → 必须确认技术栈和运行方式
-   违规表现：未经用户确认技术方案就开始实现
-   纠正动作：暂停实现，输出方案等待确认
-
-□ 6. demo 生成前 → 必须检查同版本原型参考
-   违规表现：未检查 prototype_folder 就直接生成
-   纠正动作：回溯检查，如有原型则参考，如无则记录
-
-□ 7. demo 独立任务 → 应并行分发给多个 Sub-Agent
-   违规表现：串行执行可并行的独立任务
-   纠正动作：重新拆解为并行任务
-
-□ 8. demo 生成后 → 必须完成可运行性验证
-   违规表现：未运行 lint/build/test 就标记完成
-   纠正动作：立即执行验证，失败则修复
-
-□ 9. 每次到达 checkpoint 后 → 立即更新 `.pm_state.json`
-   违规表现：延迟写入或忘记写入
-   纠正动作：立即补写，并记录延迟原因
-
-□ 10. 修改文档/原型/demo 后 → 必须读取 `rules/sync_workflow.md` 确认同步范围
-    违规表现：直接修改其他交付物而未确认同步范围
-    纠正动作：停止修改，读取 sync_workflow.md 走同步流程
-
-## 记忆分层
-- L1 `.pm_state.json`：运行状态、checkpoint、路径、任务状态
-- L2 `memory/project_memory.md`：项目背景、决策、偏好、待确认问题
-- L3 `memory/harness_memory.md`：固定行为约束和 Harness 启动协议
-
-## 读取原则（顺序严格，失败处理明确）
-
-1. 启动时必须按顺序读取：L3 → L2 → L1
-   - L3 读取失败：报告用户，按 CLAUDE.md 默认协议继续
-   - L2 读取失败：跳过，不报错，继续读取 L1
-   - L1 读取失败：视为全新开始，执行全新开始输出
-
-2. workflow 规则文件读取限制：
-   - 只允许读取当前 active_workflow 对应的规则文件
-   - 禁止以"预习""参考"为由读取其他 workflow 文件
-   - 禁止一次性读取全部 rules/*.md
+然后按 `.pm_state.json.current_context_files` 读取。禁止一次性读取全部 workflow、全部交付物、全部模板、全部专家或全部过程文件。
 
 ## 写入原则
-- L1 每个 checkpoint 立即写入
-- L2 只写结论，不写过程
-- L3 只在工作流规则变化时更新
 
-## 写入自检（每次写入前执行）
+每到 checkpoint 必须更新：
 
-□ 是否到达 checkpoint？→ `.pm_state.json` 是否已更新？
-□ 是否已写入 L2？→ `memory/project_memory.md` 是否已更新？
-□ 写入内容是否只包含结论？→ 是否删除了过程描述？
-□ 写入后是否验证了文件内容？→ 是否确认写入成功？
+1. `.pm_state.json`
+2. 当前 `memory/process/*.md`
+3. `memory/handoff.md`
+4. 受影响的 `_index.md`
+5. 必要时更新 `memory/project_memory.md`
+6. 定稿或验证通过时更新 `out_files/`
+
+## 自检
+
+- 当前节点是否正确？
+- 是否需要用户明确确认？
+- 是否只读取了当前节点需要的文件？
+- 是否更新了 checkpoint 相关文件？
+- 是否把复用信息和来源给用户确认？
+- 是否处理了 documents 冲突？
+- 是否只按需加载专家？

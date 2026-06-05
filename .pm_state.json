@@ -1,40 +1,105 @@
 {
+  "schema_version": "1.7",
   "phase": 1,
   "active_workflow": "requirements",
+  "last_checkpoint": "requirements_intake",
+  "current_node": "requirements.intake",
+  "current_node_goal": "判断需求清晰度，并决定直接进入 PRD 或先使用前期分析工具",
+  "process_file": "memory/process/requirements.clarify.md",
+  "handoff_file": "memory/handoff.md",
+  "loaded_memory_layers": [],
+  "context_policy": {
+    "mode": "ask",
+    "compression_enabled": null,
+    "cache_first_threshold_tokens": 500000,
+    "compression_first_threshold_tokens": 150000,
+    "ask_on_model_change": true,
+    "last_confirmed_model": null,
+    "fallback_when_near_context_limit": true,
+    "recording_always_on": true
+  },
+  "current_context_files": [
+    "rules/startup.md",
+    "rules/guardrails.md",
+    ".pm_state.json",
+    "memory/handoff.md",
+    "memory/project_memory.md",
+    "memory/process/requirements.clarify.md",
+    "rules/requirements_workflow.md",
+    "rules/template_routing.md"
+  ],
+  "forbidden_context_files": [
+    ".skills/",
+    "templates/",
+    "rules/prototype_workflow.md",
+    "rules/demo_workflow.md",
+    "rules/sync_workflow.md",
+    "prototype/",
+    "demo/",
+    "out_files/"
+  ],
+  "resume_required_files": [
+    "rules/startup.md",
+    "rules/guardrails.md",
+    ".pm_state.json",
+    "memory/handoff.md"
+  ],
+  "index_files": {
+    "documents": "documents/_index.md",
+    "prototype": "prototype/_index.md",
+    "demo": "demo/_index.md",
+    "out_files": "out_files/"
+  },
+  "document_intake": {
+    "clarity_status": null,
+    "selected_pre_prd_tool": null,
+    "selected_template": null,
+    "selected_template_stage": null,
+    "selected_experts": [],
+    "known_info_confirmed": false,
+    "conflict_status": null
+  },
   "doc_file": null,
+  "doc_html_file": null,
   "doc_finalized": false,
+  "doc_summary": {
+    "project_name": null,
+    "version": null,
+    "modules": [],
+    "open_questions_count": 0,
+    "last_review_status": null
+  },
+  "generated_documents": [],
   "delivery_type": null,
   "prototype_folder": null,
   "prototype_version": null,
   "prototype_finalized": false,
-  "demo_folder": null,
-  "demo_finalized": false,
-  "demo_version": null,
-  "demo_tech_stack": null,
-  "demo_run_command": null,
-  "last_checkpoint": "phase1_in_progress",
-  "last_doc_review_result": null,
-  "last_prototype_review_result": null,
-  "last_demo_validation_result": null,
-  "last_sync_result": null,
-  "last_sync_scope": null,
-  "loaded_memory_layers": [],
-  "resume_required_files": [
-    "CLAUDE.md",
-    "memory/harness_memory.md",
-    "memory/project_memory.md",
-    ".pm_state.json"
-  ],
-  "feature_list": null,
   "prototype_pages": {
     "confirmed_list": [],
     "completed": [],
     "failed": []
   },
+  "demo_folder": null,
+  "demo_finalized": false,
+  "demo_version": null,
+  "demo_tech_stack": null,
+  "demo_run_command": null,
   "demo_tasks": {
     "confirmed_list": [],
     "running": [],
     "completed": [],
     "failed": []
-  }
+  },
+  "out_files": {
+    "documents": [],
+    "prototype": [],
+    "demo": [],
+    "last_exported_at": null
+  },
+  "last_doc_review_result": null,
+  "last_expert_review_result": null,
+  "last_prototype_review_result": null,
+  "last_demo_validation_result": null,
+  "last_sync_result": null,
+  "last_sync_scope": null
 }
