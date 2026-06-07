@@ -1,22 +1,36 @@
 #!/usr/bin/env python3
 """Build an HTML requirement document from a Markdown source file.
 
+Generated documents are delivery artifacts and default to out_files/documents.
+
 Usage:
-  python scripts/build_requirement_html.py documents/example.md
-  python scripts/build_requirement_html.py documents/example.md documents/example.html
+  python scripts/build_requirement_html.py out_files/documents/example.md
+  python scripts/build_requirement_html.py out_files/documents/example.md out_files/documents/example.html
 """
 
 from __future__ import annotations
 
+import argparse
 import html
 import re
-import sys
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_TEMPLATE = ROOT / "templates" / "需求说明文档模板.html"
-DEFAULT_PRD = ROOT / "documents"
+DEFAULT_DOCUMENTS = ROOT / "out_files" / "documents"
+REQUIRED_PRD_SECTIONS = [
+    "目的背景介绍",
+    "产品目标与衡量指标",
+    "用户角色与场景",
+    "业务流程图与产品架构图",
+    "功能边界",
+    "功能需求明细",
+    "业务规则与数据规则",
+    "非功能需求与上线计划",
+    "依赖与风险",
+    "测试与验收自检清单",
+]
 
 
 def parse_frontmatter(text: str) -> tuple[dict[str, str], str]:
@@ -101,6 +115,7 @@ def parse_table(lines: list[str]) -> str:
             raw_cells = raw_cells[: expected_columns - 1] + [" | ".join(raw_cells[expected_columns - 1 :])]
         cells = [inline_md(cell.strip()) for cell in raw_cells]
         rows.append(cells)
+
     out = ["<table>", "<tbody>"]
     for index, cells in enumerate(rows):
         if index > 0 and expected_columns > 1 and len(cells) == 1:
@@ -145,8 +160,7 @@ def markdown_to_html(markdown: str, heading_offset: int = 1) -> str:
 
     index = 0
     while index < len(lines):
-        raw = lines[index]
-        line = raw.rstrip()
+        line = lines[index].rstrip()
         stripped = line.strip()
 
         if stripped.startswith("```"):
@@ -264,7 +278,10 @@ def section_group(title: str, index: int) -> str:
 
 def build_overview(meta: dict[str, str]) -> str:
     title = meta.get("title") or f"{meta.get('project_name', '项目')} {meta.get('version', 'V1.0')} 需求说明"
-    summary = meta.get("summary", "本文档用于统一产品、设计、前端、后端、测试对需求范围、页面逻辑和验收标准的理解。")
+    summary = meta.get(
+        "summary",
+        "本文档用于统一产品、设计、前端、后端、测试对需求范围、页面逻辑和验收标准的理解。",
+    )
     notes = [item.strip() for item in re.split(r"[;；]", meta.get("update_notes", "")) if item.strip()]
     links = [item.strip() for item in re.split(r"[;；]", meta.get("prototype_links", "")) if item.strip()]
 
@@ -289,8 +306,8 @@ def build_overview(meta: dict[str, str]) -> str:
       </section>"""
 
 
-def build_sections(markdown: str) -> str:
-    rendered = [build_overview(current_meta)]
+def build_sections(markdown: str, meta: dict[str, str]) -> str:
+    rendered = [build_overview(meta)]
     for index, (title, body) in enumerate(split_sections(markdown), start=1):
         section_id = slugify(title, f"section-{index}")
         group = section_group(title, index)
@@ -315,36 +332,63 @@ def apply_template(template: str, meta: dict[str, str], content: str, output_nam
     }
     for key, value in values.items():
         template = template.replace("{{" + key + "}}", value)
+
+    if "{{DOC_CONTENT}}" not in template and content not in template:
+        template = re.sub(
+            r'(<main\s+class="doc"[^>]*>)(.*?)(</main>)',
+            lambda match: match.group(1) + "\n      " + content + "\n    " + match.group(3),
+            template,
+            flags=re.S,
+            count=1,
+        )
+
+    template = re.sub(r"<title>.*?</title>", f"<title>{html.escape(values['DOC_TITLE'])}</title>", template, count=1)
+    template = re.sub(r"(<div class=\"toc-title\"><h1>).*?(</h1>)", rf"\1{html.escape(values['PROJECT_NAME'])}\2", template, count=1)
+    template = re.sub(r"(<span class=\"version\">).*?(</span>)", rf"\1{html.escape(values['VERSION'])}\2", template, count=1)
+    template = re.sub(r"(const fileName = \").*?(\")", rf"\1{html.escape(output_name)}\2", template, count=1)
     return template
 
 
+def missing_prd_sections(markdown: str) -> list[str]:
+    headings = {match.group(1).strip() for match in re.finditer(r"^#\s+(.+)$", markdown, flags=re.M)}
+    return [section for section in REQUIRED_PRD_SECTIONS if section not in headings]
+
+
 def main() -> int:
-    if len(sys.argv) < 2:
-        print("Usage: python scripts/build_requirement_html.py <source.md> [output.html]", file=sys.stderr)
-        return 2
+    parser = argparse.ArgumentParser(description="Build requirement HTML from Markdown.")
+    parser.add_argument("source", type=Path, help="Markdown source path.")
+    parser.add_argument("output", type=Path, nargs="?", help="HTML output path. Defaults to out_files/documents/<source>.html.")
+    parser.add_argument("--allow-missing-sections", action="store_true", help="Do not fail when PRD sections are incomplete.")
+    args = parser.parse_args()
 
-    source = Path(sys.argv[1]).resolve()
+    source = args.source.resolve()
     if not source.exists():
-        print(f"Markdown source not found: {source}", file=sys.stderr)
-        return 1
+        parser.error(f"Markdown source not found: {source}")
 
-    output = Path(sys.argv[2]).resolve() if len(sys.argv) >= 3 else DEFAULT_PRD / (source.stem + ".html")
+    output = args.output.resolve() if args.output else DEFAULT_DOCUMENTS / (source.stem + ".html")
     text = source.read_text(encoding="utf-8")
     meta, body = parse_frontmatter(text)
 
-    global current_meta
-    current_meta = meta
-    template_path = Path(meta.get("template", DEFAULT_TEMPLATE)).resolve()
-    template = template_path.read_text(encoding="utf-8")
-    html_text = apply_template(template, meta, build_sections(body), output.name)
+    if meta.get("document_type", "").upper() in {"PRD", "产品需求文档"} and not args.allow_missing_sections:
+        missing = missing_prd_sections(body)
+        if missing:
+            print("PRD section check failed. Missing sections:")
+            for section in missing:
+                print(f"- {section}")
+            return 1
+
+    template_path = Path(meta.get("template", DEFAULT_TEMPLATE))
+    if not template_path.is_absolute():
+        template_path = ROOT / template_path
+    if not template_path.exists():
+        parser.error(f"HTML template not found: {template_path}")
+
+    html_text = apply_template(template_path.read_text(encoding="utf-8"), meta, build_sections(body, meta), output.name)
 
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(html_text, encoding="utf-8")
     print(f"Built {output}")
     return 0
-
-
-current_meta: dict[str, str] = {}
 
 
 if __name__ == "__main__":

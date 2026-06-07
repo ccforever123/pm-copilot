@@ -24,6 +24,7 @@
     ".pm_state.json",
     "memory/handoff.md",
     "memory/project_memory.md",
+    "rules/current_fixes.md",
     "memory/process/requirements.clarify.md",
     "rules/requirements_workflow.md",
     "rules/template_routing.md"
@@ -45,7 +46,7 @@
     "memory/handoff.md"
   ],
   "index_files": {
-    "documents": "documents/_index.md",
+    "documents": "out_files/documents/_index.md",
     "prototype": "prototype/_index.md",
     "demo": "demo/_index.md",
     "out_files": "out_files/"
