@@ -36,8 +36,7 @@
     "rules/demo_workflow.md",
     "rules/sync_workflow.md",
     "prototype/",
-    "demo/",
-    "out_files/"
+    "demo/"
   ],
   "resume_required_files": [
     "rules/startup.md",
@@ -47,8 +46,9 @@
   ],
   "index_files": {
     "documents": "out_files/documents/_index.md",
-    "prototype": "prototype/_index.md",
-    "demo": "demo/_index.md",
+    "prototype": "out_files/prototype/_index.md",
+    "demo": "out_files/demo/_index.md",
+    "custom_templates": "templates/customized/_index.md",
     "out_files": "out_files/"
   },
   "document_intake": {

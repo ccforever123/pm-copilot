@@ -119,3 +119,15 @@ next_use: "support_prd"
 - 是否记录 `template_source`？
 - 是否提取模板中的专家角色？
 - 是否将生成文档用于后续 PRD 信息归并？
+
+## Current Customized Template Rules
+
+The current effective rules for `templates/customized/` are:
+
+1. `templates/customized/` stores user-defined templates.
+2. Before reading or selecting custom templates, run `python scripts/update_custom_template_index.py`.
+3. Read `templates/customized/_index.md` before reading any custom template body.
+4. Custom templates are preferred by default over standard templates.
+5. If a custom template conflicts with a known standard template, tell the user which files conflict and ask whether to use the custom template.
+6. If the user does not explicitly choose the standard template, use the custom template.
+7. Generated documents must be written to `out_files/documents/`, not root `documents/`.

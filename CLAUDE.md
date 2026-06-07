@@ -149,3 +149,15 @@ out_files/
 6. 从 `current_node` 和 `last_checkpoint` 继续
 
 兼容旧说法：用户说“按 V1.6 恢复”“按 V1.7 恢复”或“启动 Harness”时，也按同一恢复流程执行。
+
+## Current Effective Rules
+
+Read `rules/current_fixes.md` as the highest-priority patch rule for V1.7.
+
+- All generated documents, prototypes, and demos must be written under `out_files/`.
+- Use `out_files/documents/` for Markdown and HTML requirement documents.
+- Use `out_files/prototype/{version}/` for generated prototypes.
+- Use `out_files/demo/{version}/` for runnable demos.
+- Root `documents/`, `prototype/`, and `demo/` are legacy compatibility directories only.
+- `templates/customized/` stores user-defined templates. Before accessing it, run `python scripts/update_custom_template_index.py` and read `templates/customized/_index.md`.
+- Custom templates are preferred by default. If a custom template conflicts with a standard template, tell the user and ask whether to use the custom template; if the user does not choose otherwise, use the custom template.
